@@ -108,7 +108,7 @@
             <h2>Target</h2>
             <p id="battleTarget">Target: <span id="targetName">Village A</span></p>
             <p id="battleStrength">Strength: <span id="targetStrength">50</span></p>
-            <button class="button" id="battleButton" style="display: none;">Attack</button>
+            <button class="button" id="battleButton" onclick="startBattle()" style="display: none;">Attack</button>
             <h2>Combat</h2>
             <h3>Player</h3>
             <p id="playerUnitsLeft">Units left: <span id="playerUnits">0</span></p>
@@ -139,6 +139,7 @@
         let playerGatherAmount = 3;
 
         let currentAssignmentAmount = 1;
+        let allSelected = false;
 
         let assignments = {
             farm: 0,
@@ -362,12 +363,13 @@
         function setAssignmentAmount(amount)
         {
             if (amount === 'all') {
+                allSelected = true;
                 currentAssignmentAmount = availableWorkers;
             } else {
+                allSelected = false;
                 currentAssignmentAmount = amount;
             }
 
-            // changes the color of the pressed button with switch
             const buttons = document.querySelectorAll('#assignments .button');
             buttons.forEach(button => {
                 button.style.background = "#444";
@@ -390,7 +392,7 @@
 
         function changeAssignment(type, amount)
         {
-            if(amount == "all")
+            if(allSelected == true)
             {
                 amount = availableWorkers;
             }
@@ -688,7 +690,7 @@
                 tickHandleBattle();
             }
 
-            availableWorkers = population - (assignments.farm + assignments.pop + assignments.wood + assignments.metal);
+            availableWorkers = population - (assignments.farm + assignments.pop + assignments.wood + assignments.metal + assignments.military + assignments.swords);
 
             updateDisplay();
             totalTicks += 1;
