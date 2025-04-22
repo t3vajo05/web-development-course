@@ -103,6 +103,9 @@
         <button class="button" id="houseButton" style="display: none;" onclick="buildHouse()">Build House (100 Wood)</button>
         <button class="button" id="mineButton" style="display: none;" onclick="buildMine()">Build Mine (300 Food, 300 Wood)</button>
         <button class="button" id="barracksButton" style="display: none;" onclick="buildBarracks()">Build Barracks (300 Food, 300 Wood, 300 Metal)</button>
+        <button class="button" id="bigHouseButton" style="display: none;" onclick="buildBigHouse()">Build Big House (1000 Food, 1000 Wood)</button>
+        <button class="button" id="biggerHouseButton" style="display: none;" onclick="buildBiggerHouse()">Build Bigger House (10000 Food, 10000 Wood, 5000 Metal)</button>
+        <button class="button" id="biggestHouseButton" style="display: none;" onclick="buildBiggestHouse()">Build Biggest House (100000 Food, 100000 Wood, 10000 Metal)</button>
     </div>
 
     <div class="assignments-battle-container" style="display: flex; gap: 20px;">
@@ -189,7 +192,10 @@
             house: 0,
             farm: 0,
             mine: 0,
-            barracks: 0
+            barracks: 0,
+            bighouse: 0,
+            biggerhouse: 0,
+            biggesthouse: 0
         }
 
         let unlocks = {
@@ -200,7 +206,10 @@
             miners: false,
             battle: false,
             barracks: false,
-            swords: false
+            swords: false,
+            bighouse: false,
+            biggerhouse: false,
+            biggesthouse: false,
         }
 
         let battleTargetVillages = [
@@ -341,6 +350,47 @@
 
                 wood -= 100;
                 maxPopulation += 2;
+                updateDisplay();
+            }
+        }
+
+        function buildBigHouse()
+        {
+            if (wood >= 1000 && food >= 1000)
+            {
+                ownedBuildings.house += 1;
+
+                food -= 1000;
+                wood -= 1000;
+                maxPopulation += 25;
+                updateDisplay();
+            }
+        }
+
+        function buildBiggerHouse()
+        {
+            if (wood >= 10000 && food >= 10000 && metal >= 5000)
+            {
+                ownedBuildings.house += 1;
+
+                food -= 10000;
+                wood -= 10000;
+                metal -= 5000;
+                maxPopulation += 250;
+                updateDisplay();
+            }
+        }
+
+        function buildBiggestHouse()
+        {
+            if (wood >= 50000 && food >= 50000 && metal >= 10000)
+            {
+                ownedBuildings.house += 1;
+
+                food -= 50000;
+                wood -= 50000;
+                metal -= 10000;
+                maxPopulation += 1000;
                 updateDisplay();
             }
         }
@@ -549,6 +599,19 @@
             {
                 playerUnlock("barracks");
             }
+
+            if (maxPopulation >= 75 && unlocks.bighouse == false)
+            {
+                playerUnlock("bighouse");
+            }
+            if (maxPopulation >= 500 && unlocks.biggerhouse == false)
+            {
+                playerUnlock("biggerhouse");
+            }
+            if (maxPopulation >= 2000 && unlocks.biggesthouse == false)
+            {
+                playerUnlock("biggesthouse");
+            }
         }
 
         function playerUnlock(type)
@@ -597,6 +660,18 @@
                     document.getElementById("swordsStats").style.width = "100%";
                     document.getElementById("swordsSection").style.display = "inline-block";
                     document.getElementById("swordsSection").style.width = "100%";
+                    break;
+                case "bighouse":
+                    unlocks.bighouse = true;
+                    document.getElementById("bigHouseButton").style.display = "inline-block";
+                    break;
+                case "biggerhouse":
+                    unlocks.biggerhouse = true;
+                    document.getElementById("biggerHouseButton").style.display = "inline-block";
+                    break;
+                case "biggesthouse":
+                    unlocks.biggesthouse = true;
+                    document.getElementById("biggestHouseButton").style.display = "inline-block";
                     break;
             }
         }
