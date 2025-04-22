@@ -429,23 +429,29 @@
             }
         }
 
-        function changeAssignment(type, amount)
-        {
-            if(allSelected == true)
-            {
-                amount = availableWorkers;
+        function changeAssignment(type, amount) {
+            if (!assignments.hasOwnProperty(type)) {
+                console.error(`Invalid assignment type: ${type}`);
+                return;
             }
-            if (amount > 0 && availableWorkers >= amount)
-            {
-                assignments[type] += amount;
-                availableWorkers -= amount;
+        
+            if (allSelected) {
+                amount = amount > 0 ? availableWorkers : -assignments[type];
             }
-            else if (amount < 0 && assignments[type] > 0 && assignments[type] >= -amount)
-            {
-                assignments[type] -= -amount;
-                availableWorkers += -amount;
+        
+            const absAmount = Math.abs(amount);
+        
+            if (amount > 0 && availableWorkers >= absAmount) {
+                assignments[type] += absAmount;
+                availableWorkers -= absAmount;
+            } else if (amount < 0 && assignments[type] >= absAmount) {
+                assignments[type] -= absAmount;
+                availableWorkers += absAmount;
+            } else {
+                console.warn(`Invalid operation: Not enough workers or assignments for type "${type}".`);
+                return;
             }
-
+        
             updateDisplay();
         }
 
