@@ -535,15 +535,16 @@
 
             maxSwords = assignments.military * 2;
 
-            if (swords + assignments.swords <= maxSwords)
+
+            for(let i = 0; i < assignments.swords; i++)
             {
-                swords += assignments.swords;
+                if (metal < 100 || swords >= maxSwords)
+                {
+                    break;
+                }
+                swords += 1;
+                metal -= 100;
             }
-            if(swords + assignments.swords > maxSwords)
-            {
-                swords = maxSwords;
-            }
-            
 
         }
 
@@ -872,7 +873,7 @@
 
             // Battle
             document.getElementById("units").textContent = assignments.military;
-            document.getElementById("militaryStrength").textContent = swords + assignments.military;
+            document.getElementById("militaryStrength").textContent = Math.floor(swords / 2) + assignments.military;
             if (assignments.military > 0 && battling == false)
             {
                 document.getElementById("battleButton").style.display = "inline-block";
@@ -887,7 +888,7 @@
             document.getElementById("enemyUnits").textContent = battleTarget.strength;
 
             // Combat Progress bars
-            let combatRatio = (assignments.military + swords) / (battleTarget.strength + assignments.military + swords) * 100;
+            let combatRatio = (assignments.military + (swords / 2)) / (battleTarget.strength + assignments.military + (swords / 2)) * 100;
             document.getElementById("combatRatioBar").style.width = combatRatio + "%";
             document.getElementById("playerUnitsLeftBar").style.width = (assignments.military / (assignments.military + battleTarget.strength)) * 100 + "%";
             document.getElementById("enemyUnitsLeftBar").style.width = (battleTarget.strength / (assignments.military + battleTarget.strength)) * 100 + "%";
