@@ -164,6 +164,7 @@
         let metal = 0;
         let maxMetal = 100;
         let swords = 0;
+        let maxSwords = 0;
         let battling = false;
 
         let population = 2;
@@ -476,7 +477,17 @@
                 metal += assignments.metal;
             }
 
-            swords += assignments.swords;
+            maxSwords = assignments.military * 2;
+
+            if (swords + assignments.swords <= maxSwords)
+            {
+                swords += assignments.swords;
+            }
+            if(swords + assignments.swords > maxSwords)
+            {
+                swords = maxSwords;
+            }
+            
 
         }
 
@@ -663,6 +674,7 @@
                     // decrease enemy strength by 1 for every 100 military units
                     battleTarget.strength -= Math.floor(assignments.military / 100);
                     assignments.military -= Math.floor(assignments.military / 100);
+                    population -= Math.floor(assignments.military / 100);
                     if(assignments.military < 0)
                     {
                         assignments.military = 0;
@@ -679,6 +691,7 @@
                     }
                     // decrease player strength
                     assignments.military -= 1;
+                    population -= 1;
                 }
 
                 // check if enemy is defeated
