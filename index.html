@@ -806,8 +806,8 @@
             document.getElementById("enemyUnits").textContent = battleTarget.strength;
 
             // Combat Progress bars
-            let combatRatio = ((assignments.military + swords) / battleTarget.strength) * 100;
-            document.getElementById("combatRatioBar").style.width = (combatRatio > 100 ? 100 : combatRatio) + "%"; // Max to 100
+            let combatRatio = (assignments.military + swords) / (battleTarget.strength + assignments.military + swords) * 100;
+            document.getElementById("combatRatioBar").style.width = combatRatio + "%";
             document.getElementById("playerUnitsLeftBar").style.width = (assignments.military / (assignments.military + battleTarget.strength)) * 100 + "%";
             document.getElementById("enemyUnitsLeftBar").style.width = (battleTarget.strength / (assignments.military + battleTarget.strength)) * 100 + "%";
         }
