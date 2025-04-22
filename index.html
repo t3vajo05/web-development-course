@@ -679,8 +679,14 @@
                 {
                     // decrease enemy strength by 1 for every 100 military units
                     battleTarget.strength -= Math.floor(assignments.military / 100);
+                    battleTarget.strength -= Math.floor(assignments.military / 100);
                     assignments.military -= Math.floor(assignments.military / 100);
                     population -= Math.floor(assignments.military / 100);
+                    swords -= Math.floor(assignments.military / 100);
+                    if(swords < 0)
+                    {
+                        swords = 0;
+                    }
                     if(assignments.military < 0)
                     {
                         assignments.military = 0;
