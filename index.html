@@ -124,8 +124,7 @@
             <p id="swordsSection" style="display: none;">Swords: <button class="button" onclick="changeAssignment('swords', -currentAssignmentAmount)">-</button> <span id="swordsWorkers">0</span> <button class="button" onclick="changeAssignment('swords', currentAssignmentAmount)">+</button></p>
         </div>
 
-        <div class="section" id="battle" style="display: inline-block;">
-        <!-- <div class="section" id="battle"> -->
+        <div class="section" id="battle" style="display: none;">
             <h2>Battle</h2>
             <p id="militaryUnitCount">Military Units: <span id="units">0</span></p>
             <p id="militaryStrengthCount">Total strength: <span id="militaryStrength">0</span></p>
@@ -230,6 +229,7 @@
             if (assignments.military > 0 && battling == false)
             {
                 battling = true;
+                document.getElementById("battleButton").style.display = "none";
                 console.log("Battle started!");
             }
         }
@@ -239,6 +239,7 @@
             if (battling == true)
             {
                 battling = false;
+                document.getElementById("battleButton").style.display = "inline-block";
                 console.log("Battle ended!");
             }
         }
@@ -769,7 +770,7 @@
             // Battle
             document.getElementById("units").textContent = assignments.military;
             document.getElementById("militaryStrength").textContent = swords + assignments.military;
-            if (assignments.military > 0)
+            if (assignments.military > 0 && battling == false)
             {
                 document.getElementById("battleButton").style.display = "inline-block";
             }
@@ -783,7 +784,8 @@
             document.getElementById("enemyUnits").textContent = battleTarget.strength;
 
             // Combat Progress bars
-            document.getElementById("combatRatioBar").style.width = ((assignments.military + swords) / battleTarget.strength) * 100 + "%";
+            let combatRatio = ((assignments.military + swords) / battleTarget.strength) * 100;
+            document.getElementById("combatRatioBar").style.width = (combatRatio > 100 ? 100 : combatRatio) + "%"; // Max to 100
             document.getElementById("playerUnitsLeftBar").style.width = (assignments.military / (assignments.military + battleTarget.strength)) * 100 + "%";
             document.getElementById("enemyUnitsLeftBar").style.width = (battleTarget.strength / (assignments.military + battleTarget.strength)) * 100 + "%";
         }
