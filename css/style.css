@@ -1,0 +1,27 @@
+body
+{
+    font-family: sans-serif;
+    background: #222;
+    color: #eee;
+    padding: 20px;
+}
+
+p
+{
+    width: 100%;
+}
+
+.button
+{
+    margin: 5px;
+    padding: 10px;
+    background: #444;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+.button:hover
+{
+    background: #666;
+}
