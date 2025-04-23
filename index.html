@@ -109,7 +109,7 @@
         <h2>Buy Buildings</h2>
         <button class="button" id="farmButton" onclick="buildFarm()">Build Farm (50 Food)</button>
         <button class="button" id="barnButton" onclick="buildBarn()">Build Barn (50 Wood)</button>        
-        <button class="button" id="houseButton" style="display: none;" onclick="buildHouse()">Build House (100 Wood)</button>
+        <button class="button" id="houseButton" style="display: none;" onclick="buildHouse()">Build House (25 Wood)</button>
         <button class="button" id="mineButton" style="display: none;" onclick="buildMine()">Build Mine (300 Food, 300 Wood)</button>
         <button class="button" id="barracksButton" style="display: none;" onclick="buildBarracks()">Build Barracks (300 Food, 300 Wood, 300 Metal)</button>
         <button class="button" id="bigHouseButton" style="display: none;" onclick="buildBigHouse()">Build Big House (1000 Food, 1000 Wood)</button>
@@ -210,7 +210,7 @@
             },
             house:
             {
-                cost: { wood: 100 },
+                cost: { wood: 25 },
                 effect: { maxPopulationIncrease: 2 },
                 description: "Increases max population.",
                 amount: 0
