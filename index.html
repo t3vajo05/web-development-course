@@ -89,12 +89,21 @@
         </div>
     </div>
 
-    <div class="section" id="gathering">
-        <h2>Gather Resources</h2>
-        <button class="button" id="buttonFood" onclick="playerStartGathering('food')">Gather Food</button>
-        <button class="button" id="buttonWood" onclick="playerStartGathering('wood')">Gather Wood</button>
-        <button class="button" id="buttonMetal" style="display: none;" onclick="playerStartGathering('metal')">Gather Metal</button>
+    <div style="display: flex; gap: 20px; align-items: flex-start;">    
+        <div class="section" id="gathering" style="flex: 1;" height="">
+            <h2>Gather Resources</h2>
+            <button class="button" id="buttonFood" onclick="playerStartGathering('food')">Gather Food</button>
+            <button class="button" id="buttonWood" onclick="playerStartGathering('wood')">Gather Wood</button>
+            <button class="button" id="buttonMetal" style="display: none;" onclick="playerStartGathering('metal')">Gather Metal</button>
+        </div>
+    
+        <div class="section" id="gamelog" style="flex: 1;">
+            <div id="log" style="height: 91px; overflow-y: auto; background: #444; padding: 10px; border-radius: 5px;">
+            </div>
+        </div>
+    
     </div>
+    
 
     <div class="section" id="buildingsbuttons">
         <h2>Buy Buildings</h2>
@@ -122,6 +131,7 @@
             <p>Farm Workers: <button class="button" onclick="changeAssignment('farm', -currentAssignmentAmount)">-</button> <span id="farmWorkers">0</span> <button class="button" onclick="changeAssignment('farm', currentAssignmentAmount)">+</button></p>
             <p>Population Workers: <button class="button" onclick="changeAssignment('pop', -currentAssignmentAmount)">-</button> <span id="popWorkers">0</span> <button class="button" onclick="changeAssignment('pop', currentAssignmentAmount)">+</button></p>
             <p>Timber Workers: <button class="button" onclick="changeAssignment('wood', -currentAssignmentAmount)">-</button> <span id="woodWorkers">0</span> <button class="button" onclick="changeAssignment('wood', currentAssignmentAmount)">+</button></p>
+            <p>Explorers: <button class="button" onclick="changeAssignment('explorers', -currentAssignmentAmount)">-</button> <span id="explorersWorkers">0</span> <button class="button" onclick="changeAssignment('explorers', currentAssignmentAmount)">+</button></p>
             <p id="minersSection" style="display: none;">Miners: <button class="button" onclick="changeAssignment('metal', -currentAssignmentAmount)">-</button> <span id="metalWorkers">0</span> <button class="button" onclick="changeAssignment('metal', currentAssignmentAmount)">+</button></p>
             <p id="militarySection" style="display: none;">Military: <button class="button" onclick="changeAssignment('military', -currentAssignmentAmount)">-</button> <span id="militaryWorkers">0</span> <button class="button" onclick="changeAssignment('military', currentAssignmentAmount)">+</button></p>
             <p id="swordsSection" style="display: none;">Swords: <button class="button" onclick="changeAssignment('swords', -currentAssignmentAmount)">-</button> <span id="swordsWorkers">0</span> <button class="button" onclick="changeAssignment('swords', currentAssignmentAmount)">+</button></p>
@@ -152,6 +162,8 @@
             </div>
         </div>
     </div>
+
+
 
     <script>
         
@@ -184,7 +196,8 @@
             wood: 0,
             metal: 0,
             swords: 0,
-            military: 0
+            military: 0,
+            explorers: 0
         };
 
         let buildings = {
@@ -274,6 +287,22 @@
             { name: "King's Castle", strength: 1000000 }
         ];
 
+        function addToLog(message)
+        {
+            const log = document.getElementById("log");
+            const newLogEntry = document.createElement("p");
+            newLogEntry.textContent = message;
+            log.appendChild(newLogEntry);
+            log.scrollTop = log.scrollHeight; // Scroll to the bottom
+
+            // limit log size
+            const logEntries = log.getElementsByTagName("p");
+            if (logEntries.length > 50)
+            {
+                log.removeChild(logEntries[0]);
+            }
+        }
+
         // should be 1st 
         let battleTarget = battleTargetVillages[0];
 
@@ -288,17 +317,25 @@
             {
                 battling = true;
                 document.getElementById("battleButton").style.display = "none";
-                console.log("Battle started!");
+                addToLog("Battle started!");
             }
         }
 
-        function endBattle()
+        function endBattle(result)
         {
+
             if (battling == true)
             {
                 battling = false;
                 document.getElementById("battleButton").style.display = "inline-block";
-                console.log("Battle ended!");
+                if (result == "victory")
+                {
+                    addToLog("You won the battle against " + battleTarget.name + "!");
+                }
+                else
+                {
+                    addToLog("You lost the battle against " + battleTarget.name);
+                }
             }
         }
 
@@ -765,11 +802,15 @@
                     document.getElementById("houseButton").style.display = "inline-block";
                     document.getElementById("houseBuildings").style.display = "inline-block";
                     document.getElementById("houseBuildings").style.width = "100%";
+
+                    addToLog("You have learned to build a house!");
                     break;
 
                 case "mine":
                     unlocks.mine = true;
                     document.getElementById("mineButton").style.display = "inline-block";
+
+                    addToLog("You now know how to make a mine!");
                     break;
                 
                 case "miners":
@@ -780,13 +821,17 @@
                     document.getElementById("buttonMetal").style.display = "inline-block";
                     document.getElementById("minersSection").style.display = "inline-block";
                     document.getElementById("minersSection").style.width = "100%";  
+
+                    addToLog("You can now train your population to be miners!");
                     break;
 
                 case "barracks":
                     unlocks.barracks = true;
                     document.getElementById("barracksButton").style.display = "inline-block";
                     document.getElementById("barracksBuildings").style.display = "inline-block";
-                    document.getElementById("barracksBuildings").style.width = "100%";                    
+                    document.getElementById("barracksBuildings").style.width = "100%";
+
+                    addToLog("You have learned how to build a barracks!");
                     break;
                 
                 case "military":
@@ -794,6 +839,8 @@
                     document.getElementById("militarySection").style.display = "inline-block";
                     document.getElementById("militarySection").style.width = "100%";
                     document.getElementById("battle").style.display = "inline-block";
+
+                    addToLog("You now know how to train your people for battle!");
                     break;
                 
                 case "swords":
@@ -802,18 +849,29 @@
                     document.getElementById("swordsStats").style.width = "100%";
                     document.getElementById("swordsSection").style.display = "inline-block";
                     document.getElementById("swordsSection").style.width = "100%";
+
+                    addToLog("You have learned to make swords!");
                     break;
+
                 case "bighouse":
                     unlocks.bighouse = true;
                     document.getElementById("bigHouseButton").style.display = "inline-block";
+
+                    addToLog("You have learned to build a big house!");
                     break;
+
                 case "biggerhouse":
                     unlocks.biggerhouse = true;
                     document.getElementById("biggerHouseButton").style.display = "inline-block";
+
+                    addToLog("You have learned to build an even bigger house!");
                     break;
+
                 case "biggesthouse":
                     unlocks.biggesthouse = true;
                     document.getElementById("biggestHouseButton").style.display = "inline-block";
+
+                    addToLog("You have learned to build the biggest house in the world!");
                     break;
             }
         }
@@ -824,7 +882,7 @@
             {
                 if (population > 0) // reduce population
                 {
-                    console.log("Population decreases by 1");
+                    addToLog("Your population is starving!");
                     population -= 1;
 
                     if ((assignments.farm + assignments.pop + assignments.wood + assignments.metal) > 0) // reduce workers
@@ -945,13 +1003,92 @@
                         incrementTarget();
                     }
                     
-                    endBattle();
+                    endBattle("victory");
                     return;
                 }
                 if (assignments.military <= 0)
                 {
-                    endBattle();
+                    endBattle("defeat");
                     return;
+                }
+            }
+        }
+
+        function tickCheckExplorers()
+        {
+            if (assignments.explorers < 1)
+            {
+                return;
+            }
+
+            if (totalTicks % 50 !== 0)
+            {
+                return;
+            }
+
+            console.log("Explorers are exploring!");
+
+            for (let i = 0; i < assignments.explorers; i++)
+            {
+                const randomChance = Math.floor(Math.random() * 100) + 1; // Generate a number between 1 and 100
+                if (randomChance === 100)
+                {
+                    // Determine the type of discovery: 50% chance for resource, 50% chance for population
+                    const discoveryType = Math.random() < 0.5 ? "resource" : "population";
+                    if (discoveryType === "resource")
+                    {
+                        const resourceTypes = ["food", "wood", "metal"];
+                        const resourceType = resourceTypes[Math.floor(Math.random() * resourceTypes.length)]; // Randomly pick one of the three resources
+                        let resourceAmount;
+                        if (resourceType === "food")
+                        {
+                            resourceAmount = Math.floor(maxFood / 10); // 1/10th of max food
+                        }
+                        else if (resourceType === "wood")
+                        {
+                            resourceAmount = Math.floor(maxWood / 10); // 1/10th of max wood
+                        }
+                        else
+                        {
+                            resourceAmount = Math.floor(maxMetal / 10); // 1/10th of max metal
+                        }
+                        
+                        if (resourceType === "food")
+                        {
+                            food = Math.min(food + resourceAmount, maxFood); // Add food, but not exceeding maxFood
+                            addToLog(`Explorers found ${resourceAmount} food!`);
+                        }
+                        else if (resourceType === "wood")
+                        {
+                            wood = Math.min(wood + resourceAmount, maxWood); // Add wood, but not exceeding maxWood
+                            addToLog(`Explorers found ${resourceAmount} wood!`);
+                        }
+                        else
+                        {
+                            metal = Math.min(metal + resourceAmount, maxMetal); // Add metal, but not exceeding maxMetal
+                            addToLog(`Explorers found ${resourceAmount} metal!`);
+                        }
+                    }
+                    else
+                    {
+                        const populationIncrease = Math.floor(Math.random() * 3) + 1; // Random increase between 1 and 3
+                        // if population was already at max, don't increase
+                        if (population < maxPopulation)
+                        {
+                            if(populationIncrease + population > maxPopulation) // goes over limit, set to max
+                            {
+                                populationIncrease = maxPopulation - population;
+                            }
+                            // Increase population
+                            population += populationIncrease;
+                            addToLog(`Explorers found ${populationIncrease} new people!`);
+                        }
+                        else
+                        {
+                            // if population was already at max, don't increase
+                            addToLog(`Explorers found ${populationIncrease} new people but you didn't have room for them!`);
+                        }
+                    }
                 }
             }
         }
@@ -963,6 +1100,7 @@
             tickUpdateFoodAndPopulation();
             tickCheckForUnlocks();
             tickPlayerGather(whatIsCurrentlyGathering)
+            tickCheckExplorers();
             tickCheckStarvation();
 
             if(battling)
@@ -970,7 +1108,11 @@
                 tickHandleBattle();
             }
 
-            availableWorkers = population - (assignments.farm + assignments.pop + assignments.wood + assignments.metal + assignments.military + assignments.swords);
+            // Calculates available workers
+            availableWorkers = population;
+            for (let key in assignments) {
+                availableWorkers -= assignments[key];
+            }
 
             updateDisplay();
             totalTicks += 1;
@@ -1011,6 +1153,8 @@
             document.getElementById("metalWorkers").textContent = formatNumber(assignments.metal);
             document.getElementById("militaryWorkers").textContent = formatNumber(assignments.military);
             document.getElementById("swordsWorkers").textContent = formatNumber(assignments.swords);
+            document.getElementById("explorersWorkers").textContent = formatNumber(assignments.explorers);
+
 
             // Battle
             document.getElementById("units").textContent = assignments.military;
