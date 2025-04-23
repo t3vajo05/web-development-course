@@ -98,8 +98,8 @@
 
     <div class="section" id="buildingsbuttons">
         <h2>Buy Buildings</h2>
-        <button class="button" onclick="buildFarm()">Build Farm (100 Food, 100 Wood)</button>
-        <button class="button" onclick="buildBarn()">Build Barn (100 Food, 100 Wood)</button>        
+        <button class="button" id="farmButton" onclick="buildFarm()">Build Farm (50 Food)</button>
+        <button class="button" id="barnButton" onclick="buildBarn()">Build Barn (50 Wood)</button>        
         <button class="button" id="houseButton" style="display: none;" onclick="buildHouse()">Build House (100 Wood)</button>
         <button class="button" id="mineButton" style="display: none;" onclick="buildMine()">Build Mine (300 Food, 300 Wood)</button>
         <button class="button" id="barracksButton" style="display: none;" onclick="buildBarracks()">Build Barracks (300 Food, 300 Wood, 300 Metal)</button>
@@ -187,16 +187,64 @@
             military: 0
         };
 
-        let ownedBuildings = {
-            barn: 0,
-            house: 0,
-            farm: 0,
-            mine: 0,
-            barracks: 0,
-            bighouse: 0,
-            biggerhouse: 0,
-            biggesthouse: 0
-        }
+        let buildings = {
+            barn:
+            {
+                cost: { wood: 50 },
+                effect: { maxWoodMultiplier: 2 },
+                description: "Increases max wood storage.",
+                amount: 0
+            },
+            house:
+            {
+                cost: { wood: 100 },
+                effect: { maxPopulationIncrease: 2 },
+                description: "Increases max population.",
+                amount: 0
+            },
+            farm:
+            {
+                cost: { food: 50},
+                effect: { maxFoodMultiplier: 2 },
+                description: "Increases max food storage.",
+                amount: 0
+            },
+            mine:
+            {
+                cost: { food: 300, wood: 300 },
+                effect: { maxMetalMultiplier: 2 },
+                description: "Increases max metal storage and unlocks miners.",
+                amount: 0
+            },
+            barracks:
+            {
+                cost: { food: 300, wood: 300, metal: 300 },
+                effect: { maxPopulationIncrease: 5 },
+                description: "Increases max population and unlocks military.",
+                amount: 0
+            },
+            bighouse:
+            {
+                cost: { food: 1000, wood: 1000 },
+                effect: { maxPopulationIncrease: 25 },
+                description: "Increases max population.",
+                amount: 0
+            },
+            biggerhouse:
+            {
+                cost: { food: 10000, wood: 10000, metal: 5000 },
+                effect: { maxPopulationIncrease: 250 },
+                description: "Increases max population.",
+                amount: 0
+            },
+            biggesthouse:
+            {
+                cost: { food: 100000, wood: 100000, metal: 10000 },
+                effect: { maxPopulationIncrease: 1000 },
+                description: "Increases max population.",
+                amount: 0
+            }
+        };
 
         let unlocks = {
             barn: true,
@@ -214,14 +262,14 @@
 
         let battleTargetVillages = [
             { name: "Brackenford Village", strength: 50 },
-            { name: "Thornmere Village", strength: 250 },
-            { name: "Elderwyn Village", strength: 1000 },
-            { name: "Frostvale Town", strength: 5000 },
-            { name: "Ironwood Town", strength: 10000 },
-            { name: "Stormwatch Town", strength: 20000 },
-            { name: "Shadowfen Town", strength: 50000 },
-            { name: "Emberfall City", strength: 100000 },
-            { name: "Dawnspire City", strength: 200000 },
+            { name: "Thornmere Village", strength: 100 },
+            { name: "Elderwyn Village", strength: 500 },
+            { name: "Frostvale Town", strength: 2000 },
+            { name: "Ironwood Town", strength: 5000 },
+            { name: "Stormwatch Town", strength: 10000 },
+            { name: "Shadowfen Town", strength: 20000 },
+            { name: "Emberfall City", strength: 40000 },
+            { name: "Dawnspire City", strength: 10000 },
             { name: "Nightshade City", strength: 500000 },
             { name: "King's Castle", strength: 1000000 }
         ];
@@ -331,116 +379,194 @@
 
         function buildBarn()
         {
-            if (food >= 100 && wood >= 100)
+            const building = buildings.barn;
+            const costWood = buildings.barn.cost.wood;
+
+            if (wood >= costWood)
             {
-                ownedBuildings.barn += 1;
-                
-                food -= 100;
-                wood -= 100;
-                maxWood = maxWood * 2;
-                updateDisplay();
-            }
-        }
+                buildings.barn.amount += 1;
 
-        function buildHouse()
-        {
-            if (wood >= 100)
-            {
-                ownedBuildings.house += 1;
+                wood -= costWood;
+                maxWood *= building.effect.maxWoodMultiplier;
 
-                wood -= 100;
-                maxPopulation += 2;
-                updateDisplay();
-            }
-        }
+                newCostWood = maxWood / 2;
+                buildings.barn.cost.wood = newCostWood;
 
-        function buildBigHouse()
-        {
-            if (wood >= 1000 && food >= 1000)
-            {
-                ownedBuildings.house += 1;
+                // change the buttons to show the new cost
+                document.getElementById("barnButton").textContent = "Build Barn (" + formatNumber(newCostWood) + " Wood)";
 
-                food -= 1000;
-                wood -= 1000;
-                maxPopulation += 25;
-                updateDisplay();
-            }
-        }
-
-        function buildBiggerHouse()
-        {
-            if (wood >= 10000 && food >= 10000 && metal >= 5000)
-            {
-                ownedBuildings.house += 1;
-
-                food -= 10000;
-                wood -= 10000;
-                metal -= 5000;
-                maxPopulation += 250;
-                updateDisplay();
-            }
-        }
-
-        function buildBiggestHouse()
-        {
-            if (wood >= 50000 && food >= 50000 && metal >= 10000)
-            {
-                ownedBuildings.house += 1;
-
-                food -= 50000;
-                wood -= 50000;
-                metal -= 10000;
-                maxPopulation += 1000;
                 updateDisplay();
             }
         }
 
         function buildFarm()
         {
-            if (food >= 100 && wood >= 100)
+            const building = buildings.farm;
+            const costFood = buildings.farm.cost.food;
+
+            if (food >= costFood)
             {
-                ownedBuildings.farm += 1;
-                food -= 100;
-                wood -= 100;
-                maxFood = maxFood * 2;
+                buildings.farm.amount += 1;
+
+                food -= costFood;
+                maxFood *= building.effect.maxFoodMultiplier;
+
+                newCostFood = maxFood / 2;
+                buildings.farm.cost.food = newCostFood;
+
+                // change the buttons to show the new cost
+                document.getElementById("farmButton").textContent = "Build Farm (" + formatNumber(newCostFood) + " Food)";
+
+                updateDisplay();
+            }
+        }
+
+        function buildHouse()
+        {
+            const building = buildings.house;
+            const costWood = buildings.house.cost.wood;
+
+            if (wood >= costWood)
+            {
+                buildings.house.amount += 1;
+
+                wood -= costWood;
+                maxPopulation += building.effect.maxPopulationIncrease;
+                
+                buildings.house.cost.wood = buildings.house.cost.wood * 2;
+
+                // change the buttons to show the new cost
+                document.getElementById("houseButton").textContent = "Build House (" + formatNumber(buildings.house.cost.wood) + " Wood)";
+
+                updateDisplay();
+            }
+        }
+
+        function buildBigHouse()
+        {
+            const building = buildings.bighouse;
+            const costWood = buildings.bighouse.cost.wood;
+            const costFood = buildings.bighouse.cost.food;
+
+            if (food >= costFood && wood >= costWood)
+            {
+                buildings.bighouse.amount += 1;
+
+                wood -= costWood;
+                maxPopulation += building.effect.maxPopulationIncrease;
+
+                buildings.house.cost.wood = buildings.house.cost.wood * 2;
+                buildings.bighouse.cost.food = buildings.bighouse.cost.food * 2;
+
+                // change the buttons to show the new cost
+                document.getElementById("bigHouseButton").textContent = "Build Big House (" + formatNumber(buildings.bigouse.cost.food) + " Food, " + formatNumber(buildings.bighouse.cost.wood) + " Wood)";
+
+                updateDisplay();
+            }
+        }
+
+        function buildBiggerHouse()
+        {
+            const building = buildings.biggerhouse;
+            const costWood = buildings.biggerhouse.cost.wood;
+            const costFood = buildings.biggerhouse.cost.food;
+            const costMetal = buildings.biggerhouse.cost.metal;
+
+            if (food >= costFood && wood >= costWood && metal >= costMetal)
+            {
+                buildings.biggerhouse.amount += 1;
+
+                food -= costFood;
+                wood -= costWood;
+                metal -= costMetal;
+                maxPopulation += building.effect.maxPopulationIncrease;
+
+                buildings.house.cost.wood = buildings.house.cost.wood * 2;
+                buildings.biggerhouse.cost.food = buildings.biggerhouse.cost.food * 2;
+                buildings.biggerhouse.cost.metal = buildings.biggerhouse.cost.metal * 2;
+
+                // change the buttons to show the new cost
+                document.getElementById("biggerHouseButton").textContent = "Build Bigger House (" + formatNumber(buildings.biggerhouse.cost.food) + " Food, " + formatNumber(buildings.biggerhouse.cost.wood) + " Wood, " + formatNumber(buildings.biggerhouse.cost.metal) + " Metal)";
+
+                updateDisplay();
+            }
+        }
+
+        function buildBiggestHouse()
+        {
+            const building = buildings.biggesthouse;
+            const costWood = buildings.biggesthouse.cost.wood;
+            const costFood = buildings.biggesthouse.cost.food;
+            const costMetal = buildings.biggesthouse.cost.metal;
+
+            if (food >= costFood && wood >= costWood && metal >= costMetal)
+            {
+                buildings.biggesthouse.amount += 1;
+
+                food -= costFood;
+                wood -= costWood;
+                metal -= costMetal;
+                maxPopulation += building.effect.maxPopulationIncrease;
+
+                buildings.house.cost.wood = buildings.house.cost.wood * 2;
+                buildings.biggesthouse.cost.food = buildings.biggesthouse.cost.food * 2;
+                buildings.biggesthouse.cost.metal = buildings.biggesthouse.cost.metal * 2;
+
+                // change the buttons to show the new cost
+                document.getElementById("biggestHouseButton").textContent = "Build Biggest House (" + formatNumber(buildings.biggesthouse.cost.food) + " Food, " + formatNumber(buildings.biggesthouse.cost.wood) + " Wood, " + formatNumber(buildings.biggesthouse.cost.metal) + " Metal)";
+
                 updateDisplay();
             }
         }
 
         function buildMine()
         {
-            if (food >= 300 && wood >= 300)
-            {
-                ownedBuildings.mine += 1;
-                food -= 300;
-                wood -= 300;
-                maxMetal = maxMetal * 2;
+            const building = buildings.mine;
+            const costFood = buildings.mine.cost.food;
+            const costWood = buildings.mine.cost.wood;
 
-                if(!unlocks.miners)
-                {
-                    unlocks.miners = true;
-                    playerUnlock("miners");
-                }
-                
+            if (food >= costFood && wood >= costWood)
+            {
+                buildings.mine.amount += 1;
+
+                food -= costFood;
+                wood -= costWood;
+                maxMetal *= building.effect.maxMetalMultiplier;
+
+                newCostFood = maxMetal / 2;
+                newCostWood = maxMetal / 2;
+                buildings.mine.cost.food = newCostFood;
+                buildings.mine.cost.wood = newCostWood;
+
+                // change the buttons to show the new cost
+                document.getElementById("mineButton").textContent = "Build Mine (" + formatNumber(newCostFood) + " Food, " + formatNumber(newCostWood) + " Wood)";
+
                 updateDisplay();
             }
         }
 
         function buildBarracks()
         {
-            if (food >= 300 && wood >= 300 && metal >= 300)
-            {
-                food -= 300;
-                wood -= 300;
-                metal -= 300;
-                ownedBuildings.barracks += 1;
-                maxPopulation += 5;
+            const building = buildings.barracks;
+            const costFood = buildings.barracks.cost.food;
+            const costWood = buildings.barracks.cost.wood;
+            const costMetal = buildings.barracks.cost.metal;
 
-                if(!unlocks.military)
-                {
-                    unlocks.military = true;
-                    playerUnlock("military");
-                }
+            if (food >= costFood && wood >= costWood && metal >= costMetal)
+            {
+                buildings.barracks.amount += 1;
+
+                food -= costFood;
+                wood -= costWood;
+                metal -= costMetal;
+                maxPopulation += building.effect.maxPopulationIncrease;
+
+                buildings.barracks.cost.food = buildings.barracks.cost.food * 2;
+                buildings.barracks.cost.wood = buildings.barracks.cost.wood * 2;
+                buildings.barracks.cost.metal = buildings.barracks.cost.metal * 2;
+
+                // change the buttons to show the new cost
+                document.getElementById("barracksButton").textContent = "Build Barracks (" + formatNumber(buildings.barracks.cost.food) + " Food, " + formatNumber(buildings.barracks.cost.wood) + " Wood, " + formatNumber(buildings.barracks.cost.metal) + " Metal)";
 
                 updateDisplay();
             }
@@ -852,24 +978,24 @@
             document.getElementById("metalProgress").style.width = (metal / maxMetal) * 100 + "%";
 
             // Buildings
-            document.getElementById("barn").textContent = ownedBuildings.barn;
-            document.getElementById("house").textContent = ownedBuildings.house;
-            document.getElementById("farm").textContent = ownedBuildings.farm;
-            document.getElementById("mine").textContent = ownedBuildings.mine;
-            document.getElementById("barracks").textContent = ownedBuildings.barracks;
+            document.getElementById("barn").textContent = formatNumber(buildings.barn.amount);
+            document.getElementById("house").textContent = formatNumber(buildings.house.amount);
+            document.getElementById("farm").textContent = formatNumber(buildings.farm.amount);
+            document.getElementById("mine").textContent = formatNumber(buildings.mine.amount);
+            document.getElementById("barracks").textContent = formatNumber(buildings.barracks.amount);
 
             // Population
             document.getElementById("population").textContent = formatNumber(population);
             document.getElementById("maxPopulation").textContent = formatNumber(maxPopulation);
 
             // Assignments
-            document.getElementById("availableWorkers").textContent = availableWorkers;
-            document.getElementById("farmWorkers").textContent = assignments.farm;
-            document.getElementById("popWorkers").textContent = assignments.pop;
-            document.getElementById("woodWorkers").textContent = assignments.wood;
-            document.getElementById("metalWorkers").textContent = assignments.metal;
-            document.getElementById("militaryWorkers").textContent = assignments.military;
-            document.getElementById("swordsWorkers").textContent = assignments.swords;
+            document.getElementById("availableWorkers").textContent = formatNumber(availableWorkers);
+            document.getElementById("farmWorkers").textContent = formatNumber(assignments.farm);
+            document.getElementById("popWorkers").textContent = formatNumber(assignments.pop);
+            document.getElementById("woodWorkers").textContent = formatNumber(assignments.wood);
+            document.getElementById("metalWorkers").textContent = formatNumber(assignments.metal);
+            document.getElementById("militaryWorkers").textContent = formatNumber(assignments.military);
+            document.getElementById("swordsWorkers").textContent = formatNumber(assignments.swords);
 
             // Battle
             document.getElementById("units").textContent = assignments.military;
