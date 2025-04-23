@@ -211,7 +211,7 @@
             },
             mine:
             {
-                cost: { food: 300, wood: 300 },
+                cost: { food: 300, wood: 300, metal: 0 },
                 effect: { maxMetalMultiplier: 2 },
                 description: "Increases max metal storage and unlocks miners.",
                 amount: 0
@@ -524,8 +524,9 @@
             const building = buildings.mine;
             const costFood = buildings.mine.cost.food;
             const costWood = buildings.mine.cost.wood;
+            const costMetal = buildings.mine.cost.metal;
 
-            if (food >= costFood && wood >= costWood)
+            if (food >= costFood && wood >= costWood && metal >= costMetal)
             {
                 buildings.mine.amount += 1;
 
@@ -533,13 +534,15 @@
                 wood -= costWood;
                 maxMetal *= building.effect.maxMetalMultiplier;
 
-                newCostFood = maxMetal / 2;
-                newCostWood = maxMetal / 2;
+                newCostFood = costFood * 2;
+                newCostWood = costWood * 2;
+                newCostMetal = maxMetal / 2;
                 buildings.mine.cost.food = newCostFood;
                 buildings.mine.cost.wood = newCostWood;
+                buildings.mine.cost.metal = newCostMetal;
 
                 // change the buttons to show the new cost
-                document.getElementById("mineButton").textContent = "Build Mine (" + formatNumber(newCostFood) + " Food, " + formatNumber(newCostWood) + " Wood)";
+                document.getElementById("mineButton").textContent = "Build Mine (" + formatNumber(newCostFood) + " Food, " + formatNumber(newCostWood) + " Wood, " + formatNumber(newCostMetal) + " Metal)";
 
                 if(!unlocks.miners)
                 {
@@ -579,7 +582,7 @@
                     unlocks.military = true;
                     playerUnlock("military");
                 }
-                
+
                 updateDisplay();
             }
         }
