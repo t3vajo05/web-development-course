@@ -541,6 +541,12 @@
                 // change the buttons to show the new cost
                 document.getElementById("mineButton").textContent = "Build Mine (" + formatNumber(newCostFood) + " Food, " + formatNumber(newCostWood) + " Wood)";
 
+                if(!unlocks.miners)
+                {
+                    unlocks.miners = true;
+                    playerUnlock("miners");
+                }
+
                 updateDisplay();
             }
         }
@@ -568,6 +574,12 @@
                 // change the buttons to show the new cost
                 document.getElementById("barracksButton").textContent = "Build Barracks (" + formatNumber(buildings.barracks.cost.food) + " Food, " + formatNumber(buildings.barracks.cost.wood) + " Wood, " + formatNumber(buildings.barracks.cost.metal) + " Metal)";
 
+                if(!unlocks.military)
+                {
+                    unlocks.military = true;
+                    playerUnlock("military");
+                }
+                
                 updateDisplay();
             }
         }
