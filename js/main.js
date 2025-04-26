@@ -1,0 +1,1015 @@
+let food = 50;
+let maxFood = 100;
+let wood = 0;
+let maxWood = 100;
+let metal = 0;
+let maxMetal = 100;
+let swords = 0;
+let maxSwords = 0;
+let battling = false;
+
+let population = 2;
+let maxPopulation = 5;
+
+let availableWorkers = population;
+
+let playerIsCurrentlyGathering = false;
+let whatIsCurrentlyGathering = "";
+let gatheringInterval = 3000; // 3 seconds
+let lastGatheringTime = 0;
+let playerGatherAmount = 3;
+
+let currentAssignmentAmount = 1;
+let allSelected = false;
+
+let totalTicks = 0;
+
+let battleTargetVillages = [
+    { name: "Brackenford Village", strength: 50 },
+    { name: "Thornmere Village", strength: 100 },
+    { name: "Elderwyn Village", strength: 500 },
+    { name: "Frostvale Town", strength: 2000 },
+    { name: "Ironwood Town", strength: 5000 },
+    { name: "Stormwatch Town", strength: 10000 },
+    { name: "Shadowfen Town", strength: 20000 },
+    { name: "Emberfall City", strength: 40000 },
+    { name: "Dawnspire City", strength: 10000 },
+    { name: "Nightshade City", strength: 500000 },
+    { name: "King's Castle", strength: 1000000 }
+];
+
+let battleTarget = battleTargetVillages[0];
+
+let assignments = {
+    farm: 0,
+    pop: 0,
+    wood: 0,
+    metal: 0,
+    swords: 0,
+    military: 0,
+    explorers: 0
+};
+
+document.getElementById("button1").style.background = "#666"; // defaults the button 1 as selected
+
+let unlocks = {
+    barn: true,
+    house: false,
+    farm: true,
+    mine: false,
+    miners: false,
+    battle: false,
+    barracks: false,
+    swords: false,
+    bighouse: false,
+    biggerhouse: false,
+    biggesthouse: false,
+}
+
+let buildings = {
+    barn:
+    {
+        cost: { wood: 50 },
+        effect: { maxWoodMultiplier: 2 },
+        description: "Increases max wood storage.",
+        amount: 0
+    },
+    house:
+    {
+        cost: { wood: 5 },
+        effect: { maxPopulationIncrease: 2 },
+        description: "Increases max population.",
+        amount: 0
+    },
+    farm:
+    {
+        cost: { food: 50},
+        effect: { maxFoodMultiplier: 2 },
+        description: "Increases max food storage.",
+        amount: 0
+    },
+    mine:
+    {
+        cost: { food: 100, wood: 100, metal: 0 },
+        effect: { maxMetalMultiplier: 2 },
+        description: "Increases max metal storage and unlocks miners.",
+        amount: 0
+    },
+    barracks:
+    {
+        cost: { food: 100, wood: 100, metal: 100 },
+        effect: { maxPopulationIncrease: 5 },
+        description: "Increases max population and unlocks military.",
+        amount: 0
+    },
+    bighouse:
+    {
+        cost: { food: 1000, wood: 1000 },
+        effect: { maxPopulationIncrease: 25 },
+        description: "Increases max population.",
+        amount: 0
+    },
+    biggerhouse:
+    {
+        cost: { food: 10000, wood: 10000, metal: 5000 },
+        effect: { maxPopulationIncrease: 250 },
+        description: "Increases max population.",
+        amount: 0
+    },
+    biggesthouse:
+    {
+        cost: { food: 100000, wood: 100000, metal: 10000 },
+        effect: { maxPopulationIncrease: 1000 },
+        description: "Increases max population.",
+        amount: 0
+    }
+};
+
+
+function buildBarn()
+{
+    const building = buildings.barn;
+    const costWood = buildings.barn.cost.wood;
+
+    if (wood >= costWood)
+    {
+        buildings.barn.amount += 1;
+
+        wood -= costWood;
+        maxWood *= building.effect.maxWoodMultiplier;
+
+        newCostWood = maxWood / 2;
+        buildings.barn.cost.wood = newCostWood;
+
+        // change the buttons to show the new cost
+        document.getElementById("barnButton").textContent = "Build Barn (" + formatNumber(newCostWood) + " Wood)";
+
+        updateDisplay();
+    }
+}
+
+function buildFarm()
+{
+    const building = buildings.farm;
+    const costFood = buildings.farm.cost.food;
+
+    if (food >= costFood)
+    {
+        buildings.farm.amount += 1;
+
+        food -= costFood;
+        maxFood *= building.effect.maxFoodMultiplier;
+
+        newCostFood = maxFood / 2;
+        buildings.farm.cost.food = newCostFood;
+
+        // change the buttons to show the new cost
+        document.getElementById("farmButton").textContent = "Build Farm (" + formatNumber(newCostFood) + " Food)";
+
+        updateDisplay();
+    }
+}
+
+function buildHouse()
+{
+    const building = buildings.house;
+    const costWood = buildings.house.cost.wood;
+
+    if (wood >= costWood)
+    {
+        buildings.house.amount += 1;
+
+        wood -= costWood;
+        maxPopulation += building.effect.maxPopulationIncrease;
+        
+        buildings.house.cost.wood = buildings.house.cost.wood * 2;
+
+        // change the buttons to show the new cost
+        document.getElementById("houseButton").textContent = "Build House (" + formatNumber(buildings.house.cost.wood) + " Wood)";
+
+        updateDisplay();
+    }
+}
+
+function buildBigHouse()
+{
+    const building = buildings.bighouse;
+    const costWood = buildings.bighouse.cost.wood;
+    const costFood = buildings.bighouse.cost.food;
+
+    if (food >= costFood && wood >= costWood)
+    {
+        buildings.bighouse.amount += 1;
+
+        wood -= costWood;
+        maxPopulation += building.effect.maxPopulationIncrease;
+
+        buildings.house.cost.wood = buildings.house.cost.wood * 2;
+        buildings.bighouse.cost.food = buildings.bighouse.cost.food * 2;
+
+        // change the buttons to show the new cost
+        document.getElementById("bigHouseButton").textContent = "Build Big House (" + formatNumber(buildings.bigouse.cost.food) + " Food, " + formatNumber(buildings.bighouse.cost.wood) + " Wood)";
+
+        updateDisplay();
+    }
+}
+
+function buildBiggerHouse()
+{
+    const building = buildings.biggerhouse;
+    const costWood = buildings.biggerhouse.cost.wood;
+    const costFood = buildings.biggerhouse.cost.food;
+    const costMetal = buildings.biggerhouse.cost.metal;
+
+    if (food >= costFood && wood >= costWood && metal >= costMetal)
+    {
+        buildings.biggerhouse.amount += 1;
+
+        food -= costFood;
+        wood -= costWood;
+        metal -= costMetal;
+        maxPopulation += building.effect.maxPopulationIncrease;
+
+        buildings.house.cost.wood = buildings.house.cost.wood * 2;
+        buildings.biggerhouse.cost.food = buildings.biggerhouse.cost.food * 2;
+        buildings.biggerhouse.cost.metal = buildings.biggerhouse.cost.metal * 2;
+
+        // change the buttons to show the new cost
+        document.getElementById("biggerHouseButton").textContent = "Build Bigger House (" + formatNumber(buildings.biggerhouse.cost.food) + " Food, " + formatNumber(buildings.biggerhouse.cost.wood) + " Wood, " + formatNumber(buildings.biggerhouse.cost.metal) + " Metal)";
+
+        updateDisplay();
+    }
+}
+
+function buildBiggestHouse()
+{
+    const building = buildings.biggesthouse;
+    const costWood = buildings.biggesthouse.cost.wood;
+    const costFood = buildings.biggesthouse.cost.food;
+    const costMetal = buildings.biggesthouse.cost.metal;
+
+    if (food >= costFood && wood >= costWood && metal >= costMetal)
+    {
+        buildings.biggesthouse.amount += 1;
+
+        food -= costFood;
+        wood -= costWood;
+        metal -= costMetal;
+        maxPopulation += building.effect.maxPopulationIncrease;
+
+        buildings.house.cost.wood = buildings.house.cost.wood * 2;
+        buildings.biggesthouse.cost.food = buildings.biggesthouse.cost.food * 2;
+        buildings.biggesthouse.cost.metal = buildings.biggesthouse.cost.metal * 2;
+
+        // change the buttons to show the new cost
+        document.getElementById("biggestHouseButton").textContent = "Build Biggest House (" + formatNumber(buildings.biggesthouse.cost.food) + " Food, " + formatNumber(buildings.biggesthouse.cost.wood) + " Wood, " + formatNumber(buildings.biggesthouse.cost.metal) + " Metal)";
+
+        updateDisplay();
+    }
+}
+
+function buildMine()
+{
+    const building = buildings.mine;
+    const costFood = buildings.mine.cost.food;
+    const costWood = buildings.mine.cost.wood;
+    const costMetal = buildings.mine.cost.metal;
+
+    if (food >= costFood && wood >= costWood && metal >= costMetal)
+    {
+        buildings.mine.amount += 1;
+
+        food -= costFood;
+        wood -= costWood;
+        maxMetal *= building.effect.maxMetalMultiplier;
+
+        newCostFood = costFood * 2;
+        newCostWood = costWood * 2;
+        newCostMetal = maxMetal / 2;
+        buildings.mine.cost.food = newCostFood;
+        buildings.mine.cost.wood = newCostWood;
+        buildings.mine.cost.metal = newCostMetal;
+
+        // change the buttons to show the new cost
+        document.getElementById("mineButton").textContent = "Build Mine (" + formatNumber(newCostFood) + " Food, " + formatNumber(newCostWood) + " Wood, " + formatNumber(newCostMetal) + " Metal)";
+
+        if(!unlocks.miners)
+        {
+            unlocks.miners = true;
+            playerUnlock("miners");
+        }
+
+        updateDisplay();
+    }
+}
+
+function buildBarracks()
+{
+    const building = buildings.barracks;
+    const costFood = buildings.barracks.cost.food;
+    const costWood = buildings.barracks.cost.wood;
+    const costMetal = buildings.barracks.cost.metal;
+
+    if (food >= costFood && wood >= costWood && metal >= costMetal)
+    {
+        buildings.barracks.amount += 1;
+
+        food -= costFood;
+        wood -= costWood;
+        metal -= costMetal;
+        maxPopulation += building.effect.maxPopulationIncrease;
+
+        buildings.barracks.cost.food = buildings.barracks.cost.food * 2;
+        buildings.barracks.cost.wood = buildings.barracks.cost.wood * 2;
+        buildings.barracks.cost.metal = buildings.barracks.cost.metal * 2;
+
+        // change the buttons to show the new cost
+        document.getElementById("barracksButton").textContent = "Build Barracks (" + formatNumber(buildings.barracks.cost.food) + " Food, " + formatNumber(buildings.barracks.cost.wood) + " Wood, " + formatNumber(buildings.barracks.cost.metal) + " Metal)";
+
+        if(!unlocks.military)
+        {
+            unlocks.military = true;
+            playerUnlock("military");
+        }
+
+        updateDisplay();
+    }
+}
+
+
+function playerUnlock(type)
+{
+    switch (type)
+    {
+        case "house":
+            unlocks.house = true;
+            document.getElementById("houseButton").style.display = "inline-block";
+            document.getElementById("houseBuildings").style.display = "inline-block";
+            document.getElementById("houseBuildings").style.width = "100%";
+
+            addToLog("You have learned to build a house!");
+            break;
+
+        case "mine":
+            unlocks.mine = true;
+            document.getElementById("mineButton").style.display = "inline-block";
+
+            addToLog("You now know how to make a mine!");
+            break;
+        
+        case "miners":
+            unlocks.metal = true;
+            document.getElementById("mineBuildings").style.display = "inline-block";
+            document.getElementById("mineBuildings").style.width = "100%";                
+            document.getElementById("metalStats").style.display = "flex";
+            document.getElementById("buttonMetal").style.display = "inline-block";
+            document.getElementById("minersSection").style.display = "inline-block";
+            document.getElementById("minersSection").style.width = "100%";  
+
+            addToLog("You can now train your population to be miners!");
+            break;
+
+        case "barracks":
+            unlocks.barracks = true;
+            document.getElementById("barracksButton").style.display = "inline-block";
+            document.getElementById("barracksBuildings").style.display = "inline-block";
+            document.getElementById("barracksBuildings").style.width = "100%";
+
+            addToLog("You have learned how to build a barracks!");
+            break;
+        
+        case "military":
+            unlocks.military = true;
+            document.getElementById("militarySection").style.display = "inline-block";
+            document.getElementById("militarySection").style.width = "100%";
+            document.getElementById("battle").style.display = "inline-block";
+
+            addToLog("You now know how to train your people for battle!");
+            break;
+        
+        case "swords":
+            unlocks.swords = true;
+            document.getElementById("swordsStats").style.display = "inline-block";
+            document.getElementById("swordsStats").style.width = "100%";
+            document.getElementById("swordsSection").style.display = "inline-block";
+            document.getElementById("swordsSection").style.width = "100%";
+
+            addToLog("You have learned to make swords!");
+            break;
+
+        case "bighouse":
+            unlocks.bighouse = true;
+            document.getElementById("bigHouseButton").style.display = "inline-block";
+
+            addToLog("You have learned to build a big house!");
+            break;
+
+        case "biggerhouse":
+            unlocks.biggerhouse = true;
+            document.getElementById("biggerHouseButton").style.display = "inline-block";
+
+            addToLog("You have learned to build an even bigger house!");
+            break;
+
+        case "biggesthouse":
+            unlocks.biggesthouse = true;
+            document.getElementById("biggestHouseButton").style.display = "inline-block";
+
+            addToLog("You have learned to build the biggest house in the world!");
+            break;
+    }
+}
+
+
+
+function setAssignmentAmount(amount)
+{
+    if (amount === 'all') {
+        allSelected = true;
+        currentAssignmentAmount = availableWorkers;
+    } else {
+        allSelected = false;
+        currentAssignmentAmount = amount;
+    }
+
+    const buttons = document.querySelectorAll('#assignments .button');
+    buttons.forEach(button => {
+        button.style.background = "#444";
+    });
+    switch (amount) {
+        case 1:
+            document.getElementById("button1").style.background = "#666";
+            break;
+        case 10:
+            document.getElementById("button10").style.background = "#666";
+            break;
+        case 100:
+            document.getElementById("button100").style.background = "#666";
+            break;
+        case 1000:
+            document.getElementById("button1000").style.background = "#666";
+            break;
+        case 'all':
+            document.getElementById("buttonAll").style.background = "#666";
+            break;
+    }
+}
+
+function changeAssignment(type, amount) {
+    if (!assignments.hasOwnProperty(type)) {
+        console.error(`Invalid assignment type: ${type}`);
+        return;
+    }
+
+    if (allSelected) {
+        amount = amount > 0 ? availableWorkers : -assignments[type];
+    }
+
+    const absAmount = Math.abs(amount);
+
+    if (amount > 0 && availableWorkers >= absAmount) {
+        assignments[type] += absAmount;
+        availableWorkers -= absAmount;
+    } else if (amount < 0 && assignments[type] >= absAmount) {
+        assignments[type] -= absAmount;
+        availableWorkers += absAmount;
+    } else {
+        console.warn(`Invalid operation: Not enough workers or assignments for type "${type}".`);
+        return;
+    }
+
+    updateDisplay();
+}
+
+
+function incrementTarget()
+{
+    battleTarget = battleTargetVillages[battleTargetVillages.indexOf(battleTarget) + 1];
+}
+
+function startBattle()
+{
+    if (assignments.military > 0 && battling == false)
+    {
+        battling = true;
+        document.getElementById("battleButton").style.display = "none";
+        addToLog("Battle started!");
+    }
+}
+
+function endBattle(result)
+{
+
+    if (battling == true)
+    {
+        battling = false;
+        document.getElementById("battleButton").style.display = "inline-block";
+        if (result == "victory")
+        {
+            addToLog("You won the battle against " + battleTarget.name + "!");
+        }
+        else
+        {
+            addToLog("You lost the battle against " + battleTarget.name);
+        }
+    }
+}
+
+
+function playerStartGathering(type)
+{
+    if (playerIsCurrentlyGathering)
+    {
+        if (whatIsCurrentlyGathering === type)
+        {
+            // Stop gathering the current resource
+            console.log("Player stopped gathering " + type);
+            document.getElementById("button" + type.charAt(0).toUpperCase() + type.slice(1)).style.background = "#444";
+            document.getElementById("button" + type.charAt(0).toUpperCase() + type.slice(1)).textContent = "Gather " + type;
+            playerIsCurrentlyGathering = false;
+            whatIsCurrentlyGathering = "";
+        }
+        else
+        {
+            // Switch to gathering a different resource
+            console.log("Player switched to gathering " + type);
+            document.getElementById("button" + whatIsCurrentlyGathering.charAt(0).toUpperCase() + whatIsCurrentlyGathering.slice(1)).style.background = "#444";
+            document.getElementById("button" + whatIsCurrentlyGathering.charAt(0).toUpperCase() + whatIsCurrentlyGathering.slice(1)).textContent = "Gather " + whatIsCurrentlyGathering;
+
+            document.getElementById("button" + type.charAt(0).toUpperCase() + type.slice(1)).style.background = "#666";
+            document.getElementById("button" + type.charAt(0).toUpperCase() + type.slice(1)).textContent = "Stop gathering " + type;
+            whatIsCurrentlyGathering = type;
+        }
+    }
+    else
+    {
+        // Start gathering a resource
+        console.log("Player started gathering " + type);
+        document.getElementById("button" + type.charAt(0).toUpperCase() + type.slice(1)).style.background = "#666";
+        document.getElementById("button" + type.charAt(0).toUpperCase() + type.slice(1)).textContent = "Stop gathering " + type;
+        playerIsCurrentlyGathering = true;
+        whatIsCurrentlyGathering = type;
+    }
+}
+
+function tickPlayerGather(type) // player gathers resouces
+{
+    if (type === "" || !playerIsCurrentlyGathering)
+    {
+        return;
+    }
+    let currentTime = new Date().getTime();
+    if (currentTime - lastGatheringTime >= gatheringInterval)
+    {
+        lastGatheringTime = currentTime;
+
+        if (type === "food" && food + playerGatherAmount <= maxFood)
+        {
+            food += playerGatherAmount;
+        }
+        else if (type === "wood" && wood + playerGatherAmount <= maxWood)
+        {
+            wood += playerGatherAmount;
+        }
+        else if (type === "metal" && metal + playerGatherAmount <= maxMetal)
+        {
+            metal += playerGatherAmount;
+        }
+        
+    }
+
+}
+
+function tickIncrementMaterials() // Increments materials based on assignments
+{
+    if (food + assignments.farm >= maxFood)
+    {
+        food = maxFood;
+    }
+    if (wood + assignments.wood >= maxWood)
+    {
+        wood = maxWood;
+    }
+    if (metal + assignments.metal >= maxMetal)
+    {
+        metal = maxMetal;
+    }
+
+    if (food + assignments.farm <= maxFood)
+    {
+        food += assignments.farm;
+    }
+    if (wood + assignments.wood <= maxWood)
+    {
+        wood += assignments.wood;
+    }
+    if (metal + assignments.metal <= maxMetal)
+    {
+        metal += assignments.metal;
+    }
+
+    maxSwords = assignments.military * 2;
+
+
+    for(let i = 0; i < assignments.swords; i++)
+    {
+        if (metal < 100 || swords >= maxSwords)
+        {
+            break;
+        }
+        swords += 1;
+        metal -= 100;
+    }
+
+}
+
+function tickCheckForGameOver()
+{
+    if(population === 0)
+    {
+        alert("Game over! You have no population left.");
+        location.reload();
+    }
+}
+
+function tickUpdateFoodAndPopulation() // Updates food and population every 10 ticks
+{
+    if (totalTicks % 10 === 0 && totalTicks > 9)
+    {
+        if (food - population >= 0)
+        {
+            console.log("Food decreases by: " + population);
+            food -= population;
+        }
+        else
+        {
+            console.log("Food decreases by: " + food);
+            food = 0;
+        }
+        if (population < maxPopulation && assignments.pop >= 2 && food > 0)
+        {
+            let newPopulation = Math.ceil(assignments.pop / 2);
+            if(newPopulation + population > maxPopulation) // goes over limit, set to max
+            {
+                newPopulation = maxPopulation - population;
+            }
+            console.log("Population increases by: " + newPopulation);
+            population += newPopulation;
+        }
+    }
+}
+
+function tickCheckForUnlocks() // Checks if the player has unlocked new things
+{
+    if(population >= 5 && unlocks.house == false)
+    {
+        playerUnlock("house");
+    }
+
+    if (maxPopulation >= 10 && unlocks.mine == false)
+    {
+        playerUnlock("mine");
+    }
+
+    if (maxPopulation >= 20 && metal >= 200 && unlocks.barracks == false)
+    {
+        playerUnlock("barracks");
+    }
+
+    if (maxPopulation >= 75 && unlocks.bighouse == false)
+    {
+        playerUnlock("bighouse");
+    }
+    if (maxPopulation >= 500 && unlocks.biggerhouse == false)
+    {
+        playerUnlock("biggerhouse");
+    }
+    if (maxPopulation >= 2000 && unlocks.biggesthouse == false)
+    {
+        playerUnlock("biggesthouse");
+    }
+}
+
+
+
+function tickCheckStarvation() // Checks if the player has enough food to feed the population
+{
+    if (food === 0)
+    {
+        if (population > 0) // reduce population
+        {
+            addToLog("Your population is starving!");
+            population -= 1;
+
+            if ((assignments.farm + assignments.pop + assignments.wood + assignments.metal) > 0) // reduce workers
+            {
+                const assignmentKeys = Object.keys(assignments);
+                let attempts = 0;
+                const checkedKeys = [];
+
+                while (attempts < assignmentKeys.length)
+                {
+                    const randomIndex = Math.floor(Math.random() * assignmentKeys.length);
+                    const randomKey = assignmentKeys[randomIndex];
+
+                    if (checkedKeys.includes(randomKey)) // already checked this key
+                    {
+                        continue; // next key without incrementing attempts
+                    }
+
+                    checkedKeys.push(randomKey);
+
+                    if (assignments[randomKey] > 0)
+                    {
+                        console.log("Random assignment decreases by 1: " + randomKey);
+                        assignments[randomKey] -= 1;
+                        break;
+                    }
+
+                    attempts++;
+                }
+            }
+        }
+    }
+}
+
+function tickHandleBattle()
+{
+    if (assignments.military > 0)
+    {
+        if(assignments.military > 100)
+        {
+            // decrease enemy strength by 1 for every 100 military units
+            battleTarget.strength -= Math.floor(assignments.military / 100);
+            battleTarget.strength -= Math.floor(assignments.military / 100);
+            assignments.military -= Math.floor(assignments.military / 100);
+            population -= Math.floor(assignments.military / 100);
+            swords -= Math.floor(assignments.military / 100);
+            if(swords < 0)
+            {
+                swords = 0;
+            }
+            if(assignments.military < 0)
+            {
+                assignments.military = 0;
+            }
+        }
+        else
+        {
+            // decrease enemy strength
+            battleTarget.strength -= 1;
+            if(swords > 0)
+            {
+                swords -= 1;
+                battleTarget.strength -= 1;
+            }
+            // decrease player strength
+            assignments.military -= 1;
+            population -= 1;
+        }
+
+        // check if enemy is defeated
+        if (battleTarget.strength <= 0)
+        {
+            // if we win the 1st village, unlock swords
+            if (battleTargetVillages.indexOf(battleTarget) == 0 && !unlocks.swords)
+            {
+                unlocks.swords = true;
+                playerUnlock("swords");
+            }
+            // if we win the last village, end the game
+            if (battleTargetVillages.indexOf(battleTarget) == battleTargetVillages.length - 1)
+            {
+                if (confirm("You have conquered the world! You are the new king!\n\nClick OK to reload, or Cancel to continue playing."))
+                {
+                    location.reload();
+                }
+            }
+            else
+            {
+                incrementTarget();
+            }
+            
+            endBattle("victory");
+            return;
+        }
+        if (assignments.military <= 0)
+        {
+            endBattle("defeat");
+            return;
+        }
+    }
+}
+
+function tickCheckExplorers()
+{
+    if (assignments.explorers < 1)
+    {
+        return;
+    }
+
+    if (totalTicks % 50 !== 0)
+    {
+        return;
+    }
+
+    console.log("Explorers are exploring!");
+
+    for (let i = 0; i < assignments.explorers; i++)
+    {
+        const randomChance = Math.floor(Math.random() * 100) + 1; // Generate a number between 1 and 100
+        if (randomChance === 100)
+        {
+            // Determine the type of discovery: 50% chance for resource, 50% chance for population
+            const discoveryType = Math.random() < 0.5 ? "resource" : "population";
+            if (discoveryType === "resource")
+            {
+                const resourceTypes = ["food", "wood", "metal"];
+                const resourceType = resourceTypes[Math.floor(Math.random() * resourceTypes.length)]; // Randomly pick one of the three resources
+                let resourceAmount;
+                if (resourceType === "food")
+                {
+                    resourceAmount = Math.floor(maxFood / 10); // 1/10th of max food
+                }
+                else if (resourceType === "wood")
+                {
+                    resourceAmount = Math.floor(maxWood / 10); // 1/10th of max wood
+                }
+                else
+                {
+                    resourceAmount = Math.floor(maxMetal / 10); // 1/10th of max metal
+                }
+                
+                if (resourceType === "food")
+                {
+                    food = Math.min(food + resourceAmount, maxFood); // Add food, but not exceeding maxFood
+                    addToLog(`Explorers found ${resourceAmount} food!`);
+                }
+                else if (resourceType === "wood")
+                {
+                    wood = Math.min(wood + resourceAmount, maxWood); // Add wood, but not exceeding maxWood
+                    addToLog(`Explorers found ${resourceAmount} wood!`);
+                }
+                else
+                {
+                    metal = Math.min(metal + resourceAmount, maxMetal); // Add metal, but not exceeding maxMetal
+                    addToLog(`Explorers found ${resourceAmount} metal!`);
+                }
+            }
+            else
+            {
+                const populationIncrease = Math.floor(Math.random() * 3) + 1; // Random increase between 1 and 3
+                // if population was already at max, don't increase
+                if (population < maxPopulation)
+                {
+                    if(populationIncrease + population > maxPopulation) // goes over limit, set to max
+                    {
+                        populationIncrease = maxPopulation - population;
+                    }
+                    // Increase population
+                    population += populationIncrease;
+                    addToLog(`Explorers found ${populationIncrease} new people!`);
+                }
+                else
+                {
+                    // if population was already at max, don't increase
+                    addToLog(`Explorers found ${populationIncrease} new people but you didn't have room for them!`);
+                }
+            }
+        }
+    }
+}
+
+function addToLog(message)
+{
+    const log = document.getElementById("log");
+    const newLogEntry = document.createElement("p");
+    newLogEntry.textContent = message;
+    log.appendChild(newLogEntry);
+    log.scrollTop = log.scrollHeight; // Scroll to the bottom
+
+    // limit log size
+    const logEntries = log.getElementsByTagName("p");
+    if (logEntries.length > 50)
+    {
+        log.removeChild(logEntries[0]);
+    }
+}
+
+function formatNumber(num)
+{
+    if (num >= 1_000_000_000_000_000)
+    {
+        return (num / 1_000_000_000_000_000).toFixed(1).replace(/\.0$/, '') + 'Q';
+    }
+    else if (num >= 1_000_000_000_000)
+    {
+        return (num / 1_000_000_000_000).toFixed(1).replace(/\.0$/, '') + 'T';
+    }
+    else if (num >= 1_000_000_000)
+    {
+        return (num / 1_000_000_000).toFixed(1).replace(/\.0$/, '') + 'B';
+    }
+    else if (num >= 1_000_000)
+    {
+        return (num / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'M';
+    }
+    else if (num >= 1_000)
+    {
+        return (num / 1_000).toFixed(1).replace(/\.0$/, '') + 'K';
+    }
+    else
+    {
+        return num.toString();
+    }
+}
+
+function updateDisplay()
+{
+    // Materials
+    document.getElementById("food").textContent = formatNumber(food);
+    document.getElementById("maxFood").textContent = formatNumber(maxFood);
+    document.getElementById("wood").textContent = formatNumber(wood);
+    document.getElementById("maxWood").textContent = formatNumber(maxWood);
+    document.getElementById("metal").textContent = formatNumber(metal);
+    document.getElementById("maxMetal").textContent = formatNumber(maxMetal);
+    document.getElementById("swords").textContent = formatNumber(swords);
+
+    // Materials Progress bars
+    document.getElementById("foodProgress").style.width = (food / maxFood) * 100 + "%";
+    document.getElementById("woodProgress").style.width = (wood / maxWood) * 100 + "%";
+    document.getElementById("metalProgress").style.width = (metal / maxMetal) * 100 + "%";
+
+    // Buildings
+    document.getElementById("barn").textContent = formatNumber(buildings.barn.amount);
+    document.getElementById("house").textContent = formatNumber(buildings.house.amount);
+    document.getElementById("farm").textContent = formatNumber(buildings.farm.amount);
+    document.getElementById("mine").textContent = formatNumber(buildings.mine.amount);
+    document.getElementById("barracks").textContent = formatNumber(buildings.barracks.amount);
+
+    // Population
+    document.getElementById("population").textContent = formatNumber(population);
+    document.getElementById("maxPopulation").textContent = formatNumber(maxPopulation);
+
+    // Assignments
+    document.getElementById("availableWorkers").textContent = formatNumber(availableWorkers);
+    document.getElementById("farmWorkers").textContent = formatNumber(assignments.farm);
+    document.getElementById("popWorkers").textContent = formatNumber(assignments.pop);
+    document.getElementById("woodWorkers").textContent = formatNumber(assignments.wood);
+    document.getElementById("metalWorkers").textContent = formatNumber(assignments.metal);
+    document.getElementById("militaryWorkers").textContent = formatNumber(assignments.military);
+    document.getElementById("swordsWorkers").textContent = formatNumber(assignments.swords);
+    document.getElementById("explorersWorkers").textContent = formatNumber(assignments.explorers);
+
+
+    // Battle
+    document.getElementById("units").textContent = assignments.military;
+    document.getElementById("militaryStrength").textContent = Math.floor(swords / 2) + assignments.military;
+    if (assignments.military > 0 && battling == false)
+    {
+        document.getElementById("battleButton").style.display = "inline-block";
+    }
+    else
+    {
+        document.getElementById("battleButton").style.display = "none";
+    }
+    document.getElementById("targetName").textContent = battleTarget.name;
+    document.getElementById("targetStrength").textContent = battleTarget.strength;
+    document.getElementById("playerUnits").textContent = assignments.military;
+    document.getElementById("enemyUnits").textContent = battleTarget.strength;
+
+    // Combat Progress bars
+    let combatRatio = (assignments.military + (swords / 2)) / (battleTarget.strength + assignments.military + (swords / 2)) * 100;
+    document.getElementById("combatRatioBar").style.width = combatRatio + "%";
+    document.getElementById("playerUnitsLeftBar").style.width = (assignments.military / (assignments.military + battleTarget.strength)) * 100 + "%";
+    document.getElementById("enemyUnitsLeftBar").style.width = (battleTarget.strength / (assignments.military + battleTarget.strength)) * 100 + "%";
+}
+
+
+
+function tick()
+{
+    tickCheckForGameOver();
+    tickIncrementMaterials();
+    tickUpdateFoodAndPopulation();
+    tickCheckForUnlocks();
+    tickPlayerGather(whatIsCurrentlyGathering)
+    tickCheckExplorers();
+    tickCheckStarvation();
+
+    if(battling)
+    {
+        tickHandleBattle();
+    }
+
+    // Calculates available workers
+    availableWorkers = population;
+    for (let key in assignments) {
+        availableWorkers -= assignments[key];
+    }
+
+    updateDisplay();
+    totalTicks += 1;
+}
+
+setInterval(tick, 1000);
