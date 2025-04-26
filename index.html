@@ -8,6 +8,17 @@
 <body>
     <h1>Idle Game</h1>
 
+    <div class="header">
+        <a href="#" id="resetButton" onclick="resetGame()">Reset</a>
+        <a href="#" id="saveButton" onclick="saveGame()">Save</a>
+        <a href="#" id="loadButton" onclick="exportGame()">Export</a>
+        <a href="#" id="importButton" onclick="importGame()">Import</a>
+    </div>
+    <div class="exportArea" id="exportArea" style="display: none;">
+        <textarea id="exportTextArea" rows="2" cols="50" placeholder="Exported game data will appear here"></textarea>
+        <button class="button" id="copyButton" onclick="copyToClipboard()">Copy</button>
+    </div>
+
     <div class="stats-container">
         <div class="section" id="stats">
             <h2>Resources</h2>

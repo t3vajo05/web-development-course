@@ -163,6 +163,21 @@ document.addEventListener('DOMContentLoaded', function() // Building button tool
     }
 });
 
+// checks if game data is found in local storage and asks if the player wants to load it
+function checkForSaveData()
+{
+    const saveData = localStorage.getItem("gameData");
+    if (saveData)
+    {
+        const confirmLoad = confirm("Found saved game data. Do you want to load it?");
+        if (confirmLoad)
+        {
+            loadGame();
+        }
+    }
+}
+
+checkForSaveData()
 
 function buildBarn()
 {
@@ -685,7 +700,7 @@ function tickCheckForGameOver()
     if(population === 0)
     {
         alert("Game over! You have no population left.");
-        location.reload();
+        resetGame(true);
     }
 }
 
@@ -1155,6 +1170,152 @@ function CheckBuildingAffordability()
     }
 }
 
+function resetGame(silent = false)
+{
+    if (!silent)
+    {
+        if (!confirm("Are you sure you want to reset the game?"))
+        {
+            return;
+        }
+    }
+
+    localStorage.removeItem('gameData');
+
+    location.reload();
+}
+
+function saveGame(silent = false)
+{
+    const gameData = {
+        food,
+        wood,
+        metal,
+        swords,
+        population,
+        maxPopulation,
+        maxFood,
+        maxWood,
+        maxMetal,
+        maxSwords,
+        totalTicks,
+        buildings,
+        assignments,
+        unlocks
+    };
+    localStorage.setItem("gameData", JSON.stringify(gameData));
+
+    if (!silent)
+    {
+        alert("Game saved! (The game also autosaves on every tick)");
+    }
+}
+
+function exportGame() // shows the game data in a textarea
+{
+    const exportArea = document.getElementById("exportArea");
+    exportArea.style.display = "block";
+
+    const gameData = JSON.stringify({
+        food,
+        wood,
+        metal,
+        swords,
+        population,
+        maxPopulation,
+        maxFood,
+        maxWood,
+        maxMetal,
+        maxSwords,
+        totalTicks,
+        buildings,
+        assignments,
+        unlocks
+    });
+
+    // obfuscates the game data
+    const obfuscatedData = btoa(gameData);
+    const exportTextArea = document.getElementById("exportTextArea");
+    exportTextArea.value = obfuscatedData;
+}
+
+function copyToClipboard() // Copies the exported game data to the clipboard
+{
+    const exportTextArea = document.getElementById("exportTextArea");
+    exportTextArea.select();
+    navigator.clipboard.writeText(exportTextArea.value).then(() => {
+        console.log("Text copied to clipboard");
+        alert("Game data copied to clipboard!");
+    }).catch(err => {
+        console.error("Failed to copy text: ", err);
+    });
+
+    // hides the <div class="exportArea">
+    const exportArea = document.getElementById("exportArea");
+    exportArea.style.display = "none";   
+
+}
+
+function importGame()
+{
+    const gameData = prompt("Paste your game data here:");
+    // de obfuscates the game data
+    const deobfuscatedData = atob(gameData);
+
+    if (deobfuscatedData)
+    {
+        try
+        {
+            const parsedData = JSON.parse(deobfuscatedData);
+            food = parsedData.food;
+            wood = parsedData.wood;
+            metal = parsedData.metal;
+            swords = parsedData.swords;
+            population = parsedData.population;
+            maxPopulation = parsedData.maxPopulation;
+            maxFood = parsedData.maxFood;
+            maxWood = parsedData.maxWood;
+            maxMetal = parsedData.maxMetal;
+            maxSwords = parsedData.maxSwords;
+            totalTicks = parsedData.totalTicks;
+            buildings = parsedData.buildings;
+            assignments = parsedData.assignments;
+            unlocks = parsedData.unlocks;
+
+            updateDisplay();
+        }
+        catch (e)
+        {
+            alert("Invalid game data!");
+        }
+    }
+}
+
+function loadGame()
+{
+    const gameData = JSON.parse(localStorage.getItem("gameData"));
+    if (gameData)
+    {
+        console.log("Game loaded!");
+        food = gameData.food;
+        wood = gameData.wood;
+        metal = gameData.metal;
+        swords = gameData.swords;
+        population = gameData.population;
+        maxPopulation = gameData.maxPopulation;
+        maxFood = gameData.maxFood;
+        maxWood = gameData.maxWood;
+        maxMetal = gameData.maxMetal;
+        maxSwords = gameData.maxSwords;
+        totalTicks = gameData.totalTicks;
+        buildings = gameData.buildings;
+        assignments = gameData.assignments;
+        unlocks = gameData.unlocks;
+
+        updateDisplay();
+    }
+}
+
 
 function tick()
 {
@@ -1179,6 +1340,7 @@ function tick()
 
     updateDisplay();
     totalTicks += 1;
+    saveGame(true); // silently save the game
 }
 
 setInterval(tick, 1000);

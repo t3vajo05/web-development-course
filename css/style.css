@@ -6,6 +6,12 @@ body
     padding: 20px;
 }
 
+a
+{
+    color: #444;
+    text-decoration: none;
+}
+
 .button
 {
     margin: 5px;
