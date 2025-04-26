@@ -16,6 +16,13 @@ body
     cursor: pointer;
 }
 
+.button:disabled
+{
+    background: #44444452;
+    cursor: not-allowed;
+    color: #666;
+}
+
 .button:hover
 {
     background: #666;

@@ -842,18 +842,24 @@ function tickCheckExplorers()
                 
                 if (resourceType === "food")
                 {
+                    differentFeasts = ["brought home a big feast of bear meat", "found a hidden stash of berries", "brought home a feast of fish", "found a hidden stash of nuts", "brought home a feast of wild boar"];
+                    const feast = differentFeasts[Math.floor(Math.random() * differentFeasts.length)];
                     food = Math.min(food + resourceAmount, maxFood); // Add food, but not exceeding maxFood
-                    addToLog(`Explorers found ${resourceAmount} food!`);
+                    addToLog(`Explorers ${feast}! (+${resourceAmount} food)`);
                 }
                 else if (resourceType === "wood")
                 {
+                    differentWood = ["found a hidden stash of firewood", "brought home a big stash of lumber", "found a hidden stash of logs", "brought home a big stack of branches", "found a hidden stash of wood"];
+                    const wood = differentWood[Math.floor(Math.random() * differentWood.length)];
                     wood = Math.min(wood + resourceAmount, maxWood); // Add wood, but not exceeding maxWood
-                    addToLog(`Explorers found ${resourceAmount} wood!`);
+                    addToLog(`Explorers ${wood}! (+${resourceAmount} wood)`);
                 }
                 else
                 {
+                    differentMetal = ["found a hidden stash of metal", "brought home a big stash of metal", "found a hidden stash of metal", "brought home a big stash of metal", "found a hidden stash of metal"];
+                    const metal = differentMetal[Math.floor(Math.random() * differentMetal.length)];
                     metal = Math.min(metal + resourceAmount, maxMetal); // Add metal, but not exceeding maxMetal
-                    addToLog(`Explorers found ${resourceAmount} metal!`);
+                    addToLog(`Explorers ${metal}! (+${resourceAmount} metal)`);
                 }
             }
             else
@@ -983,8 +989,34 @@ function updateDisplay()
     document.getElementById("combatRatioBar").style.width = combatRatio + "%";
     document.getElementById("playerUnitsLeftBar").style.width = (assignments.military / (assignments.military + battleTarget.strength)) * 100 + "%";
     document.getElementById("enemyUnitsLeftBar").style.width = (battleTarget.strength / (assignments.military + battleTarget.strength)) * 100 + "%";
+
+    // Building affordability
+    CheckBuildingAffordability();
 }
 
+function CheckBuildingAffordability()
+{
+    // Check if the player can afford to build a barn
+    const barnCost = buildings.barn.cost.wood;
+    if (wood >= barnCost)
+    {
+        document.getElementById("barnButton").disabled = false;
+    }
+    else
+    {
+        document.getElementById("barnButton").disabled = true;
+    }
+    // Check if the player can afford to build a farm
+    const farmCost = buildings.farm.cost.food;
+    if (food >= farmCost)
+    {
+        document.getElementById("farmButton").disabled = false;
+    }
+    else
+    {
+        document.getElementById("farmButton").disabled = true;
+    }
+}
 
 
 function tick()
