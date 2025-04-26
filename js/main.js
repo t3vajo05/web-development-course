@@ -7,6 +7,7 @@ let maxMetal = 100;
 let swords = 0;
 let maxSwords = 0;
 let battling = false;
+let research = 0;
 
 let population = 2;
 let maxPopulation = 5;
@@ -18,6 +19,11 @@ let whatIsCurrentlyGathering = "";
 let gatheringInterval = 3000; // 3 seconds
 let lastGatheringTime = 0;
 let playerGatherAmount = 3;
+
+let farmingMultiplier = 1;
+let miningMultiplier = 1;
+let timberMultiplier = 1;
+let researchMultiplier = 1;
 
 let currentAssignmentAmount = 1;
 let allSelected = false;
@@ -63,6 +69,8 @@ let unlocks = {
     bighouse: false,
     biggerhouse: false,
     biggesthouse: false,
+    library: false,
+    research: false
 }
 
 let buildings = {
@@ -128,6 +136,18 @@ let buildings = {
         effect: { maxPopulationIncrease: 1000 },
         get description() { return `Increases max population by ${this.effect.maxPopulationIncrease}.`; },
         amount: 0
+    },
+    library:
+    {
+        cost: { food: 1800, wood: 1800, metal: 1800 },
+        get description() { return "Unlocks researching."; },
+        amount: 0
+    },
+    book:
+    {
+        cost: { research: 200 },
+        get description() { return "Do some original research and write a book about it"; },
+        amount: 0
     }
 };
 
@@ -178,6 +198,56 @@ function checkForSaveData()
 }
 
 checkForSaveData()
+
+function buildBook()
+{
+    const building = buildings.book;
+    const costResearch = buildings.book.cost.research;
+
+    if (research >= costResearch)
+    {
+        buildings.book.amount += 1;
+
+        research -= costResearch;
+
+        // increase research cost for the next book
+        buildings.book.cost.research = Math.floor(costResearch * 2);
+
+        // change the buttons to show the new cost
+        document.getElementById("buyBookButton").textContent = "Write a book (" + formatNumber(buildings.book.cost.research) + " Research)";
+        // increment books amount in the library div
+        document.getElementById("booksAmount").textContent = buildings.book.amount;
+
+        updateDisplay();
+    }
+}
+
+function buildLibrary()
+{
+    const building = buildings.library;
+    const costFood = buildings.library.cost.food;
+    const costWood = buildings.library.cost.wood;
+    const costMetal = buildings.library.cost.metal;
+
+    if (food >= costFood && wood >= costWood && metal >= costMetal)
+    {
+        buildings.library.amount += 1;
+
+        food -= costFood;
+        wood -= costWood;
+        metal -= costMetal;
+
+        unlocks.research = true;
+
+        // hide the library button
+        document.getElementById("libraryButton").style.display = "none";
+
+        // show research gathering button
+        document.getElementById("buttonResearch").style.display = "inline-block";
+
+        updateDisplay();
+    }
+}
 
 function buildBarn()
 {
@@ -491,6 +561,14 @@ function playerUnlock(type)
 
             addToLog("You have learned to build the biggest house in the world!");
             break;
+        case "library":
+            unlocks.library = true;
+            document.getElementById("libraryButton").style.display = "inline-block";
+            document.getElementById("researchbuttons").style.display = "inline-block";
+            document.getElementById("researchbuttons").style.width = "100%";
+
+            addToLog("You have learned to build a library! Maybe you can do some original research.");
+            break;
     }
 }
 
@@ -647,9 +725,40 @@ function tickPlayerGather(type) // player gathers resouces
         {
             metal += playerGatherAmount;
         }
-        
+        else if (type === "research" && unlocks.research)
+        {
+            research += playerGatherAmount * researchMultiplier;
+        }        
     }
+}
 
+function readBook(type)
+{
+    if (type === "farming")
+    {
+        farmingMultiplier += 1;
+        buildings.book.amount -= 1;
+        addToLog("You are teaching your population about farming. Your farming multiplier is now " + farmingMultiplier);
+    }
+    else if(type === "timber")
+    {
+        timberMultiplier += 1;
+        buildings.book.amount -= 1;
+        addToLog("You are teaching your population about timber. Your timber multiplier is now " + timberMultiplier);
+    }
+    else if(type === "mining")
+    {
+        miningMultiplier += 1;
+        buildings.book.amount -= 1;
+        addToLog("You are teaching your population about mining. Your mining multiplier is now " + miningMultiplier);
+    }
+    else if(type === "research")
+    {
+        researchMultiplier += 1;
+        buildings.book.amount -= 1;
+        addToLog("You are teaching your population about research. Your research multiplier is now " + researchMultiplier);
+    }
+    updateDisplay();
 }
 
 function tickIncrementMaterials() // Increments materials based on assignments
@@ -669,15 +778,15 @@ function tickIncrementMaterials() // Increments materials based on assignments
 
     if (food + assignments.farm <= maxFood)
     {
-        food += assignments.farm;
+        food += assignments.farm * farmingMultiplier;
     }
     if (wood + assignments.wood <= maxWood)
     {
-        wood += assignments.wood;
+        wood += assignments.wood * timberMultiplier;
     }
     if (metal + assignments.metal <= maxMetal)
     {
-        metal += assignments.metal;
+        metal += assignments.metal * miningMultiplier;
     }
 
     maxSwords = assignments.military * 2;
@@ -746,6 +855,11 @@ function tickCheckForUnlocks() // Checks if the player has unlocked new things
     if (maxPopulation >= 20 && metal >= 200 && unlocks.barracks == false)
     {
         playerUnlock("barracks");
+    }
+
+    if (maxPopulation >= 40 && unlocks.library == false)
+    {
+        playerUnlock("library");
     }
 
     if (maxPopulation >= 55 && unlocks.bighouse == false)
@@ -1026,6 +1140,10 @@ function updateDisplay()
     document.getElementById("mine").textContent = formatNumber(buildings.mine.amount);
     document.getElementById("barracks").textContent = formatNumber(buildings.barracks.amount);
 
+    // Research
+    document.getElementById("researchPoints").textContent = formatNumber(research);
+    document.getElementById("booksAmount").textContent = formatNumber(buildings.book.amount); 
+
     // Population
     document.getElementById("population").textContent = formatNumber(population);
     document.getElementById("maxPopulation").textContent = formatNumber(maxPopulation);
@@ -1168,6 +1286,44 @@ function CheckBuildingAffordability()
     {
         document.getElementById("barracksButton").disabled = true;
     }
+    // Check if the player can afford to build a library
+    const libraryCost = buildings.library.cost.wood;
+    const libraryFoodCost = buildings.library.cost.food;
+    const libraryMetalCost = buildings.library.cost.metal;
+    if (food >= libraryFoodCost && wood >= libraryCost && metal >= libraryMetalCost)
+    {
+        document.getElementById("libraryButton").disabled = false;
+    }
+    else
+    {
+        document.getElementById("libraryButton").disabled = true;
+    }
+
+    // Check if the player can afford to build a book
+    const bookCost = buildings.book.cost.research;
+    if (research >= bookCost)
+    {
+        document.getElementById("buyBookButton").disabled = false;
+    }
+    else
+    {
+        document.getElementById("buyBookButton").disabled = true;
+    }
+
+    if(buildings.book.amount >= 1)
+    {
+        document.getElementById("researchFarmingButton").disabled = false;
+        document.getElementById("researchTimberButton").disabled = false;
+        document.getElementById("researchMiningButton").disabled = false;
+        document.getElementById("researchResearchButton").disabled = false;
+    }
+    else
+    {
+        document.getElementById("researchFarmingButton").disabled = true;
+        document.getElementById("researchTimberButton").disabled = true;
+        document.getElementById("researchMiningButton").disabled = true;
+        document.getElementById("researchResearchButton").disabled = true;
+    }
 }
 
 function resetGame(silent = false)
@@ -1205,7 +1361,8 @@ function saveGame(silent = false)
         battling,
         playerIsCurrentlyGathering,
         playerGatherAmount,
-        whatIsCurrentlyGathering
+        whatIsCurrentlyGathering,
+        research
     };
     localStorage.setItem("gameData", JSON.stringify(gameData));
 
@@ -1238,7 +1395,8 @@ function exportGame() // shows the game data in a textarea
         battling,
         playerIsCurrentlyGathering,
         playerGatherAmount,
-        whatIsCurrentlyGathering
+        whatIsCurrentlyGathering,
+        research
     });
 
     // obfuscates the game data
@@ -1308,6 +1466,7 @@ function loadGame(optionalData)
         playerIsCurrentlyGathering = gameData.playerIsCurrentlyGathering;
         playerGatherAmount = gameData.playerGatherAmount;
         whatIsCurrentlyGathering = gameData.whatIsCurrentlyGathering;
+        research = gameData.research;
 
         for (let key in unlocks)
         {
@@ -1327,11 +1486,17 @@ function loadGame(optionalData)
         document.getElementById("biggestHouseButton").textContent = "Build Biggest House (" + formatNumber(buildings.biggesthouse.cost.food) + " Food, " + formatNumber(buildings.biggesthouse.cost.wood) + " Wood, " + formatNumber(buildings.biggesthouse.cost.metal) + " Metal)";
         document.getElementById("mineButton").textContent = "Build Mine (" + formatNumber(buildings.mine.cost.food) + " Food, " + formatNumber(buildings.mine.cost.wood) + " Wood, " + formatNumber(buildings.mine.cost.metal) + " Metal)";
         document.getElementById("barracksButton").textContent = "Build Barracks (" + formatNumber(buildings.barracks.cost.food) + " Food, " + formatNumber(buildings.barracks.cost.wood) + " Wood, " + formatNumber(buildings.barracks.cost.metal) + " Metal)";
+        document.getElementById("buyBookButton").textContent = "Buy Book (" + formatNumber(buildings.book.cost.research) + " Research)";
 
         if(playerIsCurrentlyGathering)
         {
             playerIsCurrentlyGathering = false;
             playerStartGathering(whatIsCurrentlyGathering);
+        }
+
+        if(unlocks.library)
+        {
+            buildLibrary(); // Opens research
         }
 
         updateDisplay();

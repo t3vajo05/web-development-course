@@ -23,7 +23,7 @@
         <div class="section" id="stats">
             <h2>Resources</h2>
 
-            <!-- Population container -->
+            <!-- Resources container -->
             <p>Population: <span id="population">2</span> / <span id="maxPopulation">5</span></p>
 
             <div style="display: flex; align-items: center; gap: 10px;">
@@ -62,6 +62,10 @@
             <p id="houseBuildings" style="display: none;">House: <span id="house">0</span></p>            
             <p id="mineBuildings" style="display: none;">Mine: <span id="mine">0</span></p>
             <p id="barracksBuildings" style="display: none;">Barracks: <span id="barracks">0</span></p>
+            <p id="bigHouseBuildings" style="display: none;">Big House: <span id="bigHouse">0</span></p>
+            <p id="biggerHouseBuildings" style="display: none;">Bigger House: <span id="biggerHouse">0</span></p>
+            <p id="biggestHouseBuildings" style="display: none;">Biggest House: <span id="biggestHouse">0</span></p>
+            <p id="libraryBuildings" style="display: none;">Library: <span id="library">0</span></p>
         </div>
     </div>
 
@@ -74,6 +78,7 @@
             <button class="button" id="buttonFood" onclick="playerStartGathering('food')">Gather Food</button>
             <button class="button" id="buttonWood" onclick="playerStartGathering('wood')">Gather Wood</button>
             <button class="button" id="buttonMetal" style="display: none;" onclick="playerStartGathering('metal')">Gather Metal</button>
+            <button class="button" id="buttonResearch" style="display: none;" onclick="playerStartGathering('research')">Research</button>
         </div>
         
         <!-- Log container -->
@@ -84,18 +89,34 @@
     
     </div>
     
-    <!-- Buy buildings container -->
-    <div class="section" id="buildingsbuttons">
-        <h2>Buy Buildings</h2>
-        <button class="button" id="farmButton" onclick="buildFarm()">Build Farm (50 Food)</button>
-        <button class="button" id="barnButton" onclick="buildBarn()" disabled="true">Build Barn (50 Wood)</button>
-        <button class="button" id="hutButton" onclick="buildHut()" disabled="true">Build Hut (10 Wood)</button>
-        <button class="button" id="houseButton" style="display: none;" onclick="buildHouse()">Build House (100 Wood)</button>
-        <button class="button" id="mineButton" style="display: none;" onclick="buildMine()">Build Mine (100 Food, 100 Wood)</button>
-        <button class="button" id="barracksButton" style="display: none;" onclick="buildBarracks()">Build Barracks (100 Food, 100 Wood, 100 Metal)</button>
-        <button class="button" id="bigHouseButton" style="display: none;" onclick="buildBigHouse()">Build Big House (1000 Food, 1000 Wood)</button>
-        <button class="button" id="biggerHouseButton" style="display: none;" onclick="buildBiggerHouse()">Build Bigger House (10000 Food, 10000 Wood, 5000 Metal)</button>
-        <button class="button" id="biggestHouseButton" style="display: none;" onclick="buildBiggestHouse()">Build Biggest House (100000 Food, 100000 Wood, 10000 Metal)</button>
+    <div style="display: flex; gap: 20px; align-items: stretch;">
+        <!-- Buy buildings container -->
+        <div class="section" id="buildingsbuttons" style="flex: 1;">
+            <h2>Buy Buildings</h2>
+            <button class="button" id="farmButton" onclick="buildFarm()">Build Farm (50 Food)</button>
+            <button class="button" id="barnButton" onclick="buildBarn()" disabled="true">Build Barn (50 Wood)</button>
+            <button class="button" id="hutButton" onclick="buildHut()" disabled="true">Build Hut (10 Wood)</button>
+            <button class="button" id="houseButton" style="display: none;" onclick="buildHouse()">Build House (100 Wood)</button>
+            <button class="button" id="mineButton" style="display: none;" onclick="buildMine()">Build Mine (100 Food, 100 Wood)</button>
+            <button class="button" id="barracksButton" style="display: none;" onclick="buildBarracks()">Build Barracks (100 Food, 100 Wood, 100 Metal)</button>
+            <button class="button" id="bigHouseButton" style="display: none;" onclick="buildBigHouse()">Build Big House (1000 Food, 1000 Wood)</button>
+            <button class="button" id="biggerHouseButton" style="display: none;" onclick="buildBiggerHouse()">Build Bigger House (10000 Food, 10000 Wood, 5000 Metal)</button>
+            <button class="button" id="biggestHouseButton" style="display: none;" onclick="buildBiggestHouse()">Build Biggest House (100K Food, 100K Wood, 100K Metal)</button>
+            <button class="button" id="libraryButton" style="display: none;" onclick="buildLibrary()">Build Library (1.8K Food, 1.8K Wood, 1.8K Metal)</button>
+        </div>
+
+        <!-- Research / library container -->
+        <div class="section" id="researchbuttons" style="flex: 1; display: none;">
+            <h2>Library</h2>
+            <p>Research: <span id="researchPoints">0</span></p>
+            <p>Books: <span id="booksAmount">0</span></p>
+            <button class="button" id="buyBookButton" onclick="buildBook()" disabled="true">Write a book (200 Research)</button>
+            <h3>Read</h3>
+            <button class="button" id="researchFarmingButton" onclick="readBook('farming')" disabled="true">A book about farming</button>
+            <button class="button" id="researchTimberButton" onclick="readBook('timber')" disabled="true">A book about woodworking</button>
+            <button class="button" id="researchMiningButton" onclick="readBook('mining')" disabled="true">A book about mining</button>
+            <button class="button" id="researchResearchButton" onclick="readBook('research')" disabled="true">A book about writing a book</button>
+        </div>
     </div>
 
     <div class="assignments-battle-container" style="display: flex; gap: 20px;">
