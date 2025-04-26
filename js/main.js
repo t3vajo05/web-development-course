@@ -356,7 +356,7 @@ function buildBigHouse()
         wood -= costWood;
         maxPopulation += building.effect.maxPopulationIncrease;
 
-        buildings.bighouse.cost.wood = buildings.house.cost.wood * 2;
+        buildings.bighouse.cost.wood = buildings.bighouse.cost.wood * 2;
         buildings.bighouse.cost.food = buildings.bighouse.cost.food * 2;
 
         // change the buttons to show the new cost
@@ -740,25 +740,25 @@ function tickPlayerGather(type) // player gathers resouces
 
 function readBook(type)
 {
-    if (type === "farming")
+    if (type === "farming" && buildings.book.amount > 0)
     {
         farmingMultiplier += 1;
         buildings.book.amount -= 1;
         addToLog("You are teaching your population about farming. Your farming multiplier is now " + farmingMultiplier);
     }
-    else if(type === "timber")
+    else if(type === "timber" && buildings.book.amount > 0)
     {
         timberMultiplier += 1;
         buildings.book.amount -= 1;
         addToLog("You are teaching your population about timber. Your timber multiplier is now " + timberMultiplier);
     }
-    else if(type === "mining")
+    else if(type === "mining" && buildings.book.amount > 0)
     {
         miningMultiplier += 1;
         buildings.book.amount -= 1;
         addToLog("You are teaching your population about mining. Your mining multiplier is now " + miningMultiplier);
     }
-    else if(type === "research")
+    else if(type === "research" && buildings.book.amount > 0)
     {
         researchMultiplier += 1;
         buildings.book.amount -= 1;
@@ -1035,23 +1035,23 @@ function tickCheckExplorers()
                 if (resourceType === "food")
                 {
                     differentFeasts = ["brought home a big feast of bear meat", "found a hidden stash of berries", "brought home a feast of fish", "found a hidden stash of nuts", "brought home a feast of wild boar"];
-                    const feast = differentFeasts[Math.floor(Math.random() * differentFeasts.length)];
+                    const foodMsg = differentFeasts[Math.floor(Math.random() * differentFeasts.length)];
                     food = Math.min(food + resourceAmount, maxFood); // Add food, but not exceeding maxFood
-                    addToLog(`Explorers ${feast}! (+${resourceAmount} food)`);
+                    addToLog(`Explorers ${foodMsg}! (+${resourceAmount} food)`);
                 }
                 else if (resourceType === "wood")
                 {
                     differentWood = ["found a hidden stash of firewood", "brought home a big stash of lumber", "found a hidden stash of logs", "brought home a big stack of branches", "found a hidden stash of wood"];
-                    const wood = differentWood[Math.floor(Math.random() * differentWood.length)];
+                    const woodMsg = differentWood[Math.floor(Math.random() * differentWood.length)];
                     wood = Math.min(wood + resourceAmount, maxWood); // Add wood, but not exceeding maxWood
-                    addToLog(`Explorers ${wood}! (+${resourceAmount} wood)`);
+                    addToLog(`Explorers ${woodMsg}! (+${resourceAmount} wood)`);
                 }
                 else
                 {
                     differentMetal = ["found a hidden stash of metal", "brought home a big stash of metal", "found a hidden stash of metal", "brought home a big stash of metal", "found a hidden stash of metal"];
-                    const metal = differentMetal[Math.floor(Math.random() * differentMetal.length)];
+                    const metalMsg = differentMetal[Math.floor(Math.random() * differentMetal.length)];
                     metal = Math.min(metal + resourceAmount, maxMetal); // Add metal, but not exceeding maxMetal
-                    addToLog(`Explorers ${metal}! (+${resourceAmount} metal)`);
+                    addToLog(`Explorers ${metalMsg}! (+${resourceAmount} metal)`);
                 }
             }
             else
@@ -1368,7 +1368,11 @@ function saveGame(silent = false)
         playerIsCurrentlyGathering,
         playerGatherAmount,
         whatIsCurrentlyGathering,
-        research
+        research,
+        farmingMultiplier,
+        timberMultiplier,
+        miningMultiplier,
+        researchMultiplier
     };
     localStorage.setItem("gameData", JSON.stringify(gameData));
 
@@ -1402,7 +1406,11 @@ function exportGame() // shows the game data in a textarea
         playerIsCurrentlyGathering,
         playerGatherAmount,
         whatIsCurrentlyGathering,
-        research
+        research,
+        farmingMultiplier,
+        timberMultiplier,
+        miningMultiplier,
+        researchMultiplier
     });
 
     // obfuscates the game data
@@ -1473,6 +1481,10 @@ function loadGame(optionalData)
         playerGatherAmount = gameData.playerGatherAmount;
         whatIsCurrentlyGathering = gameData.whatIsCurrentlyGathering;
         research = gameData.research;
+        farmingMultiplier = gameData.farmingMultiplier;
+        timberMultiplier = gameData.timberMultiplier;
+        miningMultiplier = gameData.miningMultiplier;
+        researchMultiplier = gameData.researchMultiplier;
 
         for (let key in unlocks)
         {
@@ -1492,7 +1504,7 @@ function loadGame(optionalData)
         document.getElementById("biggestHouseButton").textContent = "Build Biggest House (" + formatNumber(buildings.biggesthouse.cost.food) + " Food, " + formatNumber(buildings.biggesthouse.cost.wood) + " Wood, " + formatNumber(buildings.biggesthouse.cost.metal) + " Metal)";
         document.getElementById("mineButton").textContent = "Build Mine (" + formatNumber(buildings.mine.cost.food) + " Food, " + formatNumber(buildings.mine.cost.wood) + " Wood, " + formatNumber(buildings.mine.cost.metal) + " Metal)";
         document.getElementById("barracksButton").textContent = "Build Barracks (" + formatNumber(buildings.barracks.cost.food) + " Food, " + formatNumber(buildings.barracks.cost.wood) + " Wood, " + formatNumber(buildings.barracks.cost.metal) + " Metal)";
-        document.getElementById("buyBookButton").textContent = "Buy Book (" + formatNumber(buildings.book.cost.research) + " Research)";
+        document.getElementById("buyBookButton").textContent = "Write a book (" + formatNumber(buildings.book.cost.research) + " Research)";
 
         if(playerIsCurrentlyGathering)
         {
@@ -1500,7 +1512,7 @@ function loadGame(optionalData)
             playerStartGathering(whatIsCurrentlyGathering);
         }
 
-        if(unlocks.library)
+        if(buildings.library.amount > 0)
         {
             // Opens research and hides library buy button
             unlocks.research = true;
