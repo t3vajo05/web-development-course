@@ -19,13 +19,17 @@ body
 .button:disabled
 {
     background: #44444452;
-    cursor: not-allowed;
     color: #666;
 }
 
 .button:hover
 {
     background: #666;
+}
+
+.button:disabled:hover
+{
+    background: #44444452;
 }
 
 .stats-container

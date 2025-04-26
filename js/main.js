@@ -50,9 +50,8 @@ let assignments = {
     explorers: 0
 };
 
-document.getElementById("button1").style.background = "#666"; // defaults the button 1 as selected
-
 let unlocks = {
+    hut: true,
     barn: true,
     house: false,
     farm: true,
@@ -71,59 +70,98 @@ let buildings = {
     {
         cost: { wood: 50 },
         effect: { maxWoodMultiplier: 2 },
-        description: "Increases max wood storage.",
+        get description() { return "Increases max wood storage."; },
+        amount: 0
+    },
+    hut:
+    {
+        cost: { wood: 10 },
+        effect: { maxPopulationIncrease: 2 },
+        get description() { return `Increases max population by ${this.effect.maxPopulationIncrease}.`; },
         amount: 0
     },
     house:
     {
-        cost: { wood: 5 },
-        effect: { maxPopulationIncrease: 2 },
-        description: "Increases max population.",
+        cost: { wood: 100 },
+        effect: { maxPopulationIncrease: 4 },
+        get description() { return `Increases max population by ${this.effect.maxPopulationIncrease}.`; },
         amount: 0
     },
     farm:
     {
-        cost: { food: 50},
+        cost: { food: 50 },
         effect: { maxFoodMultiplier: 2 },
-        description: "Increases max food storage.",
+        get description() { return "Increases max food storage."; },
         amount: 0
     },
     mine:
     {
         cost: { food: 100, wood: 100, metal: 0 },
         effect: { maxMetalMultiplier: 2 },
-        description: "Increases max metal storage and unlocks miners.",
+        get description() { return "Increases max metal storage and unlocks miners."; },
         amount: 0
     },
     barracks:
     {
         cost: { food: 100, wood: 100, metal: 100 },
         effect: { maxPopulationIncrease: 5 },
-        description: "Increases max population and unlocks military.",
+        get description() { return `Increases max population by ${this.effect.maxPopulationIncrease} and unlocks military.`; },
         amount: 0
     },
     bighouse:
     {
         cost: { food: 1000, wood: 1000 },
         effect: { maxPopulationIncrease: 25 },
-        description: "Increases max population.",
+        get description() { return `Increases max population by ${this.effect.maxPopulationIncrease}.`; },
         amount: 0
     },
     biggerhouse:
     {
         cost: { food: 10000, wood: 10000, metal: 5000 },
         effect: { maxPopulationIncrease: 250 },
-        description: "Increases max population.",
+        get description() { return `Increases max population by ${this.effect.maxPopulationIncrease}.`; },
         amount: 0
     },
     biggesthouse:
     {
         cost: { food: 100000, wood: 100000, metal: 10000 },
         effect: { maxPopulationIncrease: 1000 },
-        description: "Increases max population.",
+        get description() { return `Increases max population by ${this.effect.maxPopulationIncrease}.`; },
         amount: 0
     }
 };
+
+document.getElementById("button1").style.background = "#666"; // defaults the button 1 as selected
+
+document.addEventListener('DOMContentLoaded', function() // Building button tooltips
+{
+    const tooltips = 
+    {
+        farmButton: 'farm',
+        barnButton: 'barn',
+        hutButton: 'hut',
+        houseButton: 'house',
+        mineButton: 'mine',
+        barracksButton: 'barracks',
+        bigHouseButton: 'bighouse',
+        biggerHouseButton: 'biggerhouse',
+        biggestHouseButton: 'biggesthouse'
+    };
+
+    for (let buttonId in tooltips)
+    {
+        let button = document.getElementById(buttonId);
+        if (button)
+        {
+            let buildingKey = tooltips[buttonId];
+            let building = buildings[buildingKey];
+            if (building)
+            {
+                button.title = building.description;
+            }
+        }
+    }
+});
 
 
 function buildBarn()
@@ -165,6 +203,27 @@ function buildFarm()
 
         // change the buttons to show the new cost
         document.getElementById("farmButton").textContent = "Build Farm (" + formatNumber(newCostFood) + " Food)";
+
+        updateDisplay();
+    }
+}
+
+function buildHut()
+{
+    const building = buildings.hut;
+    const costWood = buildings.hut.cost.wood;
+
+    if (wood >= costWood)
+    {
+        buildings.hut.amount += 1;
+
+        wood -= costWood;
+        maxPopulation += building.effect.maxPopulationIncrease;
+
+        buildings.hut.cost.wood = buildings.hut.cost.wood * 2;
+
+        // change the buttons to show the new cost
+        document.getElementById("hutButton").textContent = "Build Hut (" + formatNumber(buildings.hut.cost.wood) + " Wood)";
 
         updateDisplay();
     }
@@ -420,8 +479,6 @@ function playerUnlock(type)
     }
 }
 
-
-
 function setAssignmentAmount(amount)
 {
     if (amount === 'all') {
@@ -661,7 +718,7 @@ function tickUpdateFoodAndPopulation() // Updates food and population every 10 t
 
 function tickCheckForUnlocks() // Checks if the player has unlocked new things
 {
-    if(population >= 5 && unlocks.house == false)
+    if(population >= 15 && unlocks.house == false)
     {
         playerUnlock("house");
     }
@@ -676,7 +733,7 @@ function tickCheckForUnlocks() // Checks if the player has unlocked new things
         playerUnlock("barracks");
     }
 
-    if (maxPopulation >= 75 && unlocks.bighouse == false)
+    if (maxPopulation >= 55 && unlocks.bighouse == false)
     {
         playerUnlock("bighouse");
     }
@@ -947,9 +1004,10 @@ function updateDisplay()
     document.getElementById("metalProgress").style.width = (metal / maxMetal) * 100 + "%";
 
     // Buildings
-    document.getElementById("barn").textContent = formatNumber(buildings.barn.amount);
-    document.getElementById("house").textContent = formatNumber(buildings.house.amount);
     document.getElementById("farm").textContent = formatNumber(buildings.farm.amount);
+    document.getElementById("barn").textContent = formatNumber(buildings.barn.amount);
+    document.getElementById("hut").textContent = formatNumber(buildings.hut.amount);
+    document.getElementById("house").textContent = formatNumber(buildings.house.amount);    
     document.getElementById("mine").textContent = formatNumber(buildings.mine.amount);
     document.getElementById("barracks").textContent = formatNumber(buildings.barracks.amount);
 
@@ -1015,6 +1073,85 @@ function CheckBuildingAffordability()
     else
     {
         document.getElementById("farmButton").disabled = true;
+    }
+    // Check if the player can afford to build a hut
+    const hutCost = buildings.hut.cost.wood;
+    if (wood >= hutCost)
+    {
+        document.getElementById("hutButton").disabled = false;
+    }
+    else
+    {
+        document.getElementById("hutButton").disabled = true;
+    }
+    // Check if the player can afford to build a house
+    const houseCost = buildings.house.cost.wood;
+    if (wood >= houseCost)
+    {
+        document.getElementById("houseButton").disabled = false;
+    }
+    else
+    {
+        document.getElementById("houseButton").disabled = true;
+    }
+    // Check if the player can afford to build a big house
+    const bigHouseCost = buildings.bighouse.cost.wood;
+    const bigHouseFoodCost = buildings.bighouse.cost.food;
+    if (food >= bigHouseFoodCost && wood >= bigHouseCost)
+    {
+        document.getElementById("bigHouseButton").disabled = false;
+    }
+    else
+    {
+        document.getElementById("bigHouseButton").disabled = true;
+    }
+    // Check if the player can afford to build a bigger house
+    const biggerHouseCost = buildings.biggerhouse.cost.wood;
+    const biggerHouseFoodCost = buildings.biggerhouse.cost.food;
+    const biggerHouseMetalCost = buildings.biggerhouse.cost.metal;
+    if (food >= biggerHouseFoodCost && wood >= biggerHouseCost && metal >= biggerHouseMetalCost)
+    {
+        document.getElementById("biggerHouseButton").disabled = false;
+    }
+    else
+    {
+        document.getElementById("biggerHouseButton").disabled = true;
+    }
+    // Check if the player can afford to build a biggest house
+    const biggestHouseCost = buildings.biggesthouse.cost.wood;
+    const biggestHouseFoodCost = buildings.biggesthouse.cost.food;
+    const biggestHouseMetalCost = buildings.biggesthouse.cost.metal;
+    if (food >= biggestHouseFoodCost && wood >= biggestHouseCost && metal >= biggestHouseMetalCost)
+    {
+        document.getElementById("biggestHouseButton").disabled = false;
+    }
+    else
+    {
+        document.getElementById("biggestHouseButton").disabled = true;
+    }
+    // Check if the player can afford to build a mine
+    const mineCost = buildings.mine.cost.wood;
+    const mineFoodCost = buildings.mine.cost.food;
+    const mineMetalCost = buildings.mine.cost.metal;
+    if (food >= mineFoodCost && wood >= mineCost && metal >= mineMetalCost)
+    {
+        document.getElementById("mineButton").disabled = false;
+    }
+    else
+    {
+        document.getElementById("mineButton").disabled = true;
+    }
+    // Check if the player can afford to build a barracks
+    const barracksCost = buildings.barracks.cost.wood;
+    const barracksFoodCost = buildings.barracks.cost.food;
+    const barracksMetalCost = buildings.barracks.cost.metal;
+    if (food >= barracksFoodCost && wood >= barracksCost && metal >= barracksMetalCost)
+    {
+        document.getElementById("barracksButton").disabled = false;
+    }
+    else
+    {
+        document.getElementById("barracksButton").disabled = true;
     }
 }
 

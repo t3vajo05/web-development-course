@@ -45,10 +45,11 @@
         <!-- Buildings container -->
         <div class="section" id="buildingsinfo">
             <h2>Buildings</h2>
-            <p>Farm: <span id="farm">0</span> (+ Max Food)</p>
-            <p>Barn: <span id="barn">0</span> (+ Max Wood)</p>
-            <p id="houseBuildings" style="display: none;">House: <span id="house">0</span> (+ Max Population)</p>            
-            <p id="mineBuildings" style="display: none;">Mine: <span id="mine">0</span> (+ Max Metal)</p>
+            <p>Farm: <span id="farm">0</span></p>
+            <p>Barn: <span id="barn">0</span></p>
+            <p>Hut: <span id="hut">0</span></p>
+            <p id="houseBuildings" style="display: none;">House: <span id="house">0</span></p>            
+            <p id="mineBuildings" style="display: none;">Mine: <span id="mine">0</span></p>
             <p id="barracksBuildings" style="display: none;">Barracks: <span id="barracks">0</span></p>
         </div>
     </div>
@@ -66,7 +67,7 @@
         
         <!-- Log container -->
         <div class="section" id="gamelog" style="flex: 1;">
-            <div id="log" style="height: 91px; overflow-y: auto; background: #444; padding: 10px; border-radius: 5px;">
+            <div id="log" style="height: 100px; overflow-y: auto; background: #444; padding: 10px; border-radius: 5px;">
             </div>
         </div>
     
@@ -76,8 +77,9 @@
     <div class="section" id="buildingsbuttons">
         <h2>Buy Buildings</h2>
         <button class="button" id="farmButton" onclick="buildFarm()">Build Farm (50 Food)</button>
-        <button class="button" id="barnButton" onclick="buildBarn()">Build Barn (50 Wood)</button>        
-        <button class="button" id="houseButton" style="display: none;" onclick="buildHouse()">Build House (5 Wood)</button>
+        <button class="button" id="barnButton" onclick="buildBarn()" disabled="true">Build Barn (50 Wood)</button>
+        <button class="button" id="hutButton" onclick="buildHut()" disabled="true">Build Hut (10 Wood)</button>
+        <button class="button" id="houseButton" style="display: none;" onclick="buildHouse()">Build House (100 Wood)</button>
         <button class="button" id="mineButton" style="display: none;" onclick="buildMine()">Build Mine (100 Food, 100 Wood)</button>
         <button class="button" id="barracksButton" style="display: none;" onclick="buildBarracks()">Build Barracks (100 Food, 100 Wood, 100 Metal)</button>
         <button class="button" id="bigHouseButton" style="display: none;" onclick="buildBigHouse()">Build Big House (1000 Food, 1000 Wood)</button>
