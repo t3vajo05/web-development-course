@@ -139,7 +139,7 @@ let buildings = {
     },
     library:
     {
-        cost: { food: 1800, wood: 1800, metal: 1800 },
+        cost: { food: 1200, wood: 1200, metal: 1200 },
         get description() { return "Unlocks researching."; },
         amount: 0
     },
@@ -165,7 +165,9 @@ document.addEventListener('DOMContentLoaded', function() // Building button tool
         barracksButton: 'barracks',
         bigHouseButton: 'bighouse',
         biggerHouseButton: 'biggerhouse',
-        biggestHouseButton: 'biggesthouse'
+        biggestHouseButton: 'biggesthouse',
+        libraryButton: 'library',
+        buyBookButton: 'book'
     };
 
     for (let buttonId in tooltips)
@@ -244,6 +246,12 @@ function buildLibrary()
 
         // show research gathering button
         document.getElementById("buttonResearch").style.display = "inline-block";
+
+        // shows library div
+        document.getElementById("researchbuttons").style.display = "inline-block";
+        document.getElementById("researchbuttons").style.width = "100%";
+
+        addToLog("You erect a magnificent library! You can now do research.");
 
         updateDisplay();
     }
@@ -564,8 +572,6 @@ function playerUnlock(type)
         case "library":
             unlocks.library = true;
             document.getElementById("libraryButton").style.display = "inline-block";
-            document.getElementById("researchbuttons").style.display = "inline-block";
-            document.getElementById("researchbuttons").style.width = "100%";
 
             addToLog("You have learned to build a library! Maybe you can do some original research.");
             break;
@@ -1496,7 +1502,18 @@ function loadGame(optionalData)
 
         if(unlocks.library)
         {
-            buildLibrary(); // Opens research
+            // Opens research and hides library buy button
+            unlocks.research = true;
+
+            // hide the library button
+            document.getElementById("libraryButton").style.display = "none";
+    
+            // show research gathering button
+            document.getElementById("buttonResearch").style.display = "inline-block";
+    
+            // shows library div
+            document.getElementById("researchbuttons").style.display = "inline-block";
+            document.getElementById("researchbuttons").style.width = "100%";
         }
 
         updateDisplay();
