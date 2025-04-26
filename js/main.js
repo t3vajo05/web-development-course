@@ -278,11 +278,11 @@ function buildBigHouse()
         wood -= costWood;
         maxPopulation += building.effect.maxPopulationIncrease;
 
-        buildings.house.cost.wood = buildings.house.cost.wood * 2;
+        buildings.bighouse.cost.wood = buildings.house.cost.wood * 2;
         buildings.bighouse.cost.food = buildings.bighouse.cost.food * 2;
 
         // change the buttons to show the new cost
-        document.getElementById("bigHouseButton").textContent = "Build Big House (" + formatNumber(buildings.bigouse.cost.food) + " Food, " + formatNumber(buildings.bighouse.cost.wood) + " Wood)";
+        document.getElementById("bigHouseButton").textContent = "Build Big House (" + formatNumber(buildings.bighouse.cost.food) + " Food, " + formatNumber(buildings.bighouse.cost.wood) + " Wood)";
 
         updateDisplay();
     }
@@ -1201,7 +1201,11 @@ function saveGame(silent = false)
         totalTicks,
         buildings,
         assignments,
-        unlocks
+        unlocks,
+        battling,
+        playerIsCurrentlyGathering,
+        playerGatherAmount,
+        whatIsCurrentlyGathering
     };
     localStorage.setItem("gameData", JSON.stringify(gameData));
 
@@ -1230,7 +1234,11 @@ function exportGame() // shows the game data in a textarea
         totalTicks,
         buildings,
         assignments,
-        unlocks
+        unlocks,
+        battling,
+        playerIsCurrentlyGathering,
+        playerGatherAmount,
+        whatIsCurrentlyGathering
     });
 
     // obfuscates the game data
@@ -1264,36 +1272,21 @@ function importGame()
 
     if (deobfuscatedData)
     {
-        try
-        {
-            const parsedData = JSON.parse(deobfuscatedData);
-            food = parsedData.food;
-            wood = parsedData.wood;
-            metal = parsedData.metal;
-            swords = parsedData.swords;
-            population = parsedData.population;
-            maxPopulation = parsedData.maxPopulation;
-            maxFood = parsedData.maxFood;
-            maxWood = parsedData.maxWood;
-            maxMetal = parsedData.maxMetal;
-            maxSwords = parsedData.maxSwords;
-            totalTicks = parsedData.totalTicks;
-            buildings = parsedData.buildings;
-            assignments = parsedData.assignments;
-            unlocks = parsedData.unlocks;
-
-            updateDisplay();
-        }
-        catch (e)
-        {
-            alert("Invalid game data!");
-        }
+        loadGame(deobfuscatedData);
     }
 }
 
-function loadGame()
+function loadGame(optionalData)
 {
-    const gameData = JSON.parse(localStorage.getItem("gameData"));
+    if(!optionalData)
+    {
+        gameData = JSON.parse(localStorage.getItem("gameData"));
+    }
+    else
+    {
+        gameData = JSON.parse(optionalData);
+    }
+        
     if (gameData)
     {
         console.log("Game loaded!");
@@ -1311,6 +1304,35 @@ function loadGame()
         buildings = gameData.buildings;
         assignments = gameData.assignments;
         unlocks = gameData.unlocks;
+        battling = gameData.battling;
+        playerIsCurrentlyGathering = gameData.playerIsCurrentlyGathering;
+        playerGatherAmount = gameData.playerGatherAmount;
+        whatIsCurrentlyGathering = gameData.whatIsCurrentlyGathering;
+
+        for (let key in unlocks)
+        {
+            if (unlocks[key])
+            {
+                playerUnlock(key);
+            }
+        }
+
+        // update the building buttons to show the actual costs
+        document.getElementById("barnButton").textContent = "Build Barn (" + formatNumber(buildings.barn.cost.wood) + " Wood)";
+        document.getElementById("farmButton").textContent = "Build Farm (" + formatNumber(buildings.farm.cost.food) + " Food)";
+        document.getElementById("hutButton").textContent = "Build Hut (" + formatNumber(buildings.hut.cost.wood) + " Wood)";
+        document.getElementById("houseButton").textContent = "Build House (" + formatNumber(buildings.house.cost.wood) + " Wood)";
+        document.getElementById("bigHouseButton").textContent = "Build Big House (" + formatNumber(buildings.bighouse.cost.food) + " Food, " + formatNumber(buildings.bighouse.cost.wood) + " Wood)";
+        document.getElementById("biggerHouseButton").textContent = "Build Bigger House (" + formatNumber(buildings.biggerhouse.cost.food) + " Food, " + formatNumber(buildings.biggerhouse.cost.wood) + " Wood, " + formatNumber(buildings.biggerhouse.cost.metal) + " Metal)";
+        document.getElementById("biggestHouseButton").textContent = "Build Biggest House (" + formatNumber(buildings.biggesthouse.cost.food) + " Food, " + formatNumber(buildings.biggesthouse.cost.wood) + " Wood, " + formatNumber(buildings.biggesthouse.cost.metal) + " Metal)";
+        document.getElementById("mineButton").textContent = "Build Mine (" + formatNumber(buildings.mine.cost.food) + " Food, " + formatNumber(buildings.mine.cost.wood) + " Wood, " + formatNumber(buildings.mine.cost.metal) + " Metal)";
+        document.getElementById("barracksButton").textContent = "Build Barracks (" + formatNumber(buildings.barracks.cost.food) + " Food, " + formatNumber(buildings.barracks.cost.wood) + " Wood, " + formatNumber(buildings.barracks.cost.metal) + " Metal)";
+
+        if(playerIsCurrentlyGathering)
+        {
+            playerIsCurrentlyGathering = false;
+            playerStartGathering(whatIsCurrentlyGathering);
+        }
 
         updateDisplay();
     }
