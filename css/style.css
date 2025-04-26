@@ -53,3 +53,8 @@ a
     border-radius: 10px;
 }
 
+#buildingsinfo.panel
+{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+}

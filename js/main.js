@@ -125,14 +125,14 @@ let buildings = {
     },
     biggerhouse:
     {
-        cost: { food: 10000, wood: 10000, metal: 5000 },
+        cost: { food: 20000, wood: 20000, metal: 10000 },
         effect: { maxPopulationIncrease: 250 },
         get description() { return `Increases max population by ${this.effect.maxPopulationIncrease}.`; },
         amount: 0
     },
     biggesthouse:
     {
-        cost: { food: 100000, wood: 100000, metal: 10000 },
+        cost: { food: 200000, wood: 200000, metal: 100000 },
         effect: { maxPopulationIncrease: 1000 },
         get description() { return `Increases max population by ${this.effect.maxPopulationIncrease}.`; },
         amount: 0
@@ -213,7 +213,7 @@ function buildBook()
         research -= costResearch;
 
         // increase research cost for the next book
-        buildings.book.cost.research = Math.floor(costResearch * 2);
+        buildings.book.cost.research = Math.floor(costResearch * 1.5);
 
         // change the buttons to show the new cost
         document.getElementById("buyBookButton").textContent = "Write a book (" + formatNumber(buildings.book.cost.research) + " Research)";
@@ -662,6 +662,7 @@ function endBattle(result)
         document.getElementById("battleButton").style.display = "inline-block";
         if (result == "victory")
         {
+            research += 1000 * researchMultiplier;
             addToLog("You won the battle against " + battleTarget.name + "!");
         }
         else
@@ -740,57 +741,81 @@ function tickPlayerGather(type) // player gathers resouces
 
 function readBook(type)
 {
-    if (type === "farming" && buildings.book.amount > 0)
+    if (type === "farming" && buildings.book.amount > 0 && farmingMultiplier < 256)
     {
-        farmingMultiplier += 1;
+        farmingMultiplier *= 2;
         buildings.book.amount -= 1;
         addToLog("You are teaching your population about farming. Your farming multiplier is now " + farmingMultiplier);
+        if (farmingMultiplier >= 256)
+        {
+            addToLog("Your population has mastered farming!");
+            // hide the button
+            document.getElementById("researchFarmingButton").style.display = "none";
+        }
     }
-    else if(type === "timber" && buildings.book.amount > 0)
+    else if(type === "timber" && buildings.book.amount > 0 && timberMultiplier < 256)
     {
-        timberMultiplier += 1;
+        timberMultiplier *= 2;
         buildings.book.amount -= 1;
         addToLog("You are teaching your population about timber. Your timber multiplier is now " + timberMultiplier);
+        if (timberMultiplier >= 256)
+        {
+            addToLog("Your population has mastered timber!");
+            // hide the button
+            document.getElementById("researchTimberButton").style.display = "none";
+        }
     }
-    else if(type === "mining" && buildings.book.amount > 0)
+    else if(type === "mining" && buildings.book.amount > 0 && miningMultiplier < 256)
     {
-        miningMultiplier += 1;
+        miningMultiplier *= 2;
         buildings.book.amount -= 1;
         addToLog("You are teaching your population about mining. Your mining multiplier is now " + miningMultiplier);
+        if (miningMultiplier >= 256)
+        {
+            addToLog("Your population has mastered mining!");
+            // hide the button
+            document.getElementById("researchMiningButton").style.display = "none";
+        }
     }
-    else if(type === "research" && buildings.book.amount > 0)
+    else if(type === "research" && buildings.book.amount > 0 && researchMultiplier < 256)
     {
-        researchMultiplier += 1;
+        researchMultiplier *= 2;
         buildings.book.amount -= 1;
         addToLog("You are teaching your population about research. Your research multiplier is now " + researchMultiplier);
+        if (researchMultiplier >= 256)
+        {
+            addToLog("You have mastered research!");
+            // hide the button
+            document.getElementById("researchResearchButton").style.display = "none";
+        }
     }
     updateDisplay();
 }
 
 function tickIncrementMaterials() // Increments materials based on assignments
 {
-    if (food + assignments.farm >= maxFood)
+    if (food + (assignments.farm * farmingMultiplier) >= maxFood)
     {
         food = maxFood;
     }
-    if (wood + assignments.wood >= maxWood)
+    if (wood + (assignments.wood * timberMultiplier) >= maxWood)
     {
         wood = maxWood;
     }
-    if (metal + assignments.metal >= maxMetal)
+    if (metal + (assignments.metal * miningMultiplier) >= maxMetal)
     {
         metal = maxMetal;
     }
 
-    if (food + assignments.farm <= maxFood)
+    if (food + (assignments.farm * farmingMultiplier) <= maxFood)
     {
         food += assignments.farm * farmingMultiplier;
     }
-    if (wood + assignments.wood <= maxWood)
+    if (wood + (assignments.wood * timberMultiplier) <= maxWood)
     {
         wood += assignments.wood * timberMultiplier;
     }
-    if (metal + assignments.metal <= maxMetal)
+    if (metal + (assignments.metal * miningMultiplier) <= maxMetal)
     {
         metal += assignments.metal * miningMultiplier;
     }
@@ -963,6 +988,7 @@ function tickHandleBattle()
         // check if enemy is defeated
         if (battleTarget.strength <= 0)
         {
+            endBattle("victory");
             // if we win the 1st village, unlock swords
             if (battleTargetVillages.indexOf(battleTarget) == 0 && !unlocks.swords)
             {
@@ -980,9 +1006,8 @@ function tickHandleBattle()
             else
             {
                 incrementTarget();
-            }
+            }           
             
-            endBattle("victory");
             return;
         }
         if (assignments.military <= 0)
@@ -1145,10 +1170,31 @@ function updateDisplay()
     document.getElementById("house").textContent = formatNumber(buildings.house.amount);    
     document.getElementById("mine").textContent = formatNumber(buildings.mine.amount);
     document.getElementById("barracks").textContent = formatNumber(buildings.barracks.amount);
+    document.getElementById("bigHouse").textContent = formatNumber(buildings.bighouse.amount);
+    document.getElementById("biggerHouse").textContent = formatNumber(buildings.biggerhouse.amount);
+    document.getElementById("biggestHouse").textContent = formatNumber(buildings.biggesthouse.amount);
+    document.getElementById("library").textContent = formatNumber(buildings.library.amount);
 
     // Research
     document.getElementById("researchPoints").textContent = formatNumber(research);
     document.getElementById("booksAmount").textContent = formatNumber(buildings.book.amount); 
+
+    if (farmingMultiplier >= 256)
+    {
+        document.getElementById("researchFarmingButton").style.display = "none";
+    }
+    if (timberMultiplier >= 256)
+    {
+        document.getElementById("researchTimberButton").style.display = "none";
+    }
+    if (miningMultiplier >= 256)
+    {
+        document.getElementById("researchMiningButton").style.display = "none";
+    }
+    if (researchMultiplier >= 256)
+    {
+        document.getElementById("researchResearchButton").style.display = "none";
+    }
 
     // Population
     document.getElementById("population").textContent = formatNumber(population);
@@ -1349,6 +1395,9 @@ function resetGame(silent = false)
 
 function saveGame(silent = false)
 {
+    battleTargetIndex = battleTargetVillages.indexOf(battleTarget);
+    battleTargetStrength = battleTarget.strength;
+
     const gameData = {
         food,
         wood,
@@ -1372,7 +1421,10 @@ function saveGame(silent = false)
         farmingMultiplier,
         timberMultiplier,
         miningMultiplier,
-        researchMultiplier
+        researchMultiplier,
+        battleTargetIndex,
+        battleTargetStrength
+        
     };
     localStorage.setItem("gameData", JSON.stringify(gameData));
 
@@ -1386,6 +1438,9 @@ function exportGame() // shows the game data in a textarea
 {
     const exportArea = document.getElementById("exportArea");
     exportArea.style.display = "block";
+
+    battleTargetIndex = battleTargetVillages.indexOf(battleTarget);
+    battleTargetStrength = battleTarget.strength;
 
     const gameData = JSON.stringify({
         food,
@@ -1410,7 +1465,9 @@ function exportGame() // shows the game data in a textarea
         farmingMultiplier,
         timberMultiplier,
         miningMultiplier,
-        researchMultiplier
+        researchMultiplier,
+        battleTargetIndex,
+        battleTargetStrength
     });
 
     // obfuscates the game data
@@ -1485,6 +1542,8 @@ function loadGame(optionalData)
         timberMultiplier = gameData.timberMultiplier;
         miningMultiplier = gameData.miningMultiplier;
         researchMultiplier = gameData.researchMultiplier;
+        battleTargetIndex = gameData.battleTargetIndex;
+        battleTargetStrength = gameData.battleTargetStrength;
 
         for (let key in unlocks)
         {
@@ -1527,6 +1586,9 @@ function loadGame(optionalData)
             document.getElementById("researchbuttons").style.display = "inline-block";
             document.getElementById("researchbuttons").style.width = "100%";
         }
+
+        battleTarget = battleTargetVillages[battleTargetIndex];
+        battleTarget.strength = battleTargetStrength;
 
         updateDisplay();
     }
