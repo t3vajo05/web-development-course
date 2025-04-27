@@ -1072,7 +1072,7 @@ function tickCheckExplorers()
         if (randomChance === 100)
         {
             // Determine the type of discovery: 50% chance for resource, 50% chance for population
-            const discoveryType = Math.random() < 0.5 ? "resource" : "population";
+            const discoveryType = ["resource", "population", "death"][Math.floor(Math.random() * 3)];
             if (discoveryType === "resource")
             {
                 const resourceTypes = ["food", "wood", "metal"];
@@ -1113,7 +1113,7 @@ function tickCheckExplorers()
                     addToLog(`Explorers ${metalMsg}! (+${resourceAmount} metal)`);
                 }
             }
-            else
+            else if (discoveryType === "population")
             {
                 let populationIncrease = Math.floor(Math.random() * 3) + 1; // Random increase between 1 and 3
                 // if population was already at max, don't increase
@@ -1132,6 +1132,13 @@ function tickCheckExplorers()
                     // if population was already at max, don't increase
                     addToLog(`Explorers found ${populationIncrease} new people but you didn't have room for them!`);
                 }
+            }
+            else
+            {
+                population -= 1;
+                assignments.explorers -= 1;
+                addToLog(`Your explorer perished!`);
+
             }
         }
     }
