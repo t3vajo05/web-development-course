@@ -28,6 +28,7 @@ let researchMultiplier = 1;
 let currentAssignmentAmount = 1;
 let allSelected = false;
 
+let tickSpeed = 1000; // 1 second
 let totalTicks = 0;
 
 let battleTargetVillages = [
@@ -720,17 +721,38 @@ function tickPlayerGather(type) // player gathers resouces
     {
         lastGatheringTime = currentTime;
 
-        if (type === "food" && food + playerGatherAmount <= maxFood)
+        if (type === "food")
         {
-            food += playerGatherAmount;
+            if(food + playerGatherAmount > maxFood)
+            {
+                food = maxFood;
+            }
+            else
+            {
+                food += playerGatherAmount;
+            }
         }
-        else if (type === "wood" && wood + playerGatherAmount <= maxWood)
+        else if (type === "wood")
         {
-            wood += playerGatherAmount;
+            if(wood + playerGatherAmount > maxWood)
+            {
+                wood = maxWood;
+            }
+            else
+            {
+                wood += playerGatherAmount;
+            }
         }
-        else if (type === "metal" && metal + playerGatherAmount <= maxMetal)
+        else if (type === "metal")
         {
-            metal += playerGatherAmount;
+            if(metal + playerGatherAmount > maxMetal)
+            {
+                metal = maxMetal;
+            }
+            else
+            {
+                metal += playerGatherAmount;
+            }
         }
         else if (type === "research" && unlocks.research)
         {
@@ -788,6 +810,12 @@ function readBook(type)
             // hide the button
             document.getElementById("researchResearchButton").style.display = "none";
         }
+    }
+    else if(type === "gathering" && buildings.book.amount > 0)
+    {
+        playerGatherAmount *= 2;
+        buildings.book.amount -= 1;
+        addToLog("You are learning about gathering. Your gathering amount is now " + playerGatherAmount);
     }
     updateDisplay();
 }
@@ -1081,7 +1109,7 @@ function tickCheckExplorers()
             }
             else
             {
-                const populationIncrease = Math.floor(Math.random() * 3) + 1; // Random increase between 1 and 3
+                let populationIncrease = Math.floor(Math.random() * 3) + 1; // Random increase between 1 and 3
                 // if population was already at max, don't increase
                 if (population < maxPopulation)
                 {
@@ -1119,6 +1147,99 @@ function addToLog(message)
     }
 }
 
+function calculatePerSecond(type)
+{
+    let perSecond = 0;
+    let playerGatherAmountPerSecond = playerGatherAmount / (gatheringInterval / tickSpeed);
+
+    switch (type)
+    {
+        case "food":
+
+            if(food >= maxFood)
+            {
+                perSecond = 0;
+                break;
+            }
+
+            perSecond = assignments.farm * farmingMultiplier;
+
+            if(playerIsCurrentlyGathering && whatIsCurrentlyGathering === "food")
+            {
+                perSecond += playerGatherAmountPerSecond;
+            }
+
+            break;
+
+        case "wood":
+
+            if(wood >= maxWood)
+            {
+                perSecond = 0;
+                break;
+            }
+
+            perSecond = assignments.wood * timberMultiplier;
+
+            if(playerIsCurrentlyGathering && whatIsCurrentlyGathering === "wood")
+            {
+                perSecond += playerGatherAmountPerSecond;
+            }
+
+            break;
+        case "metal":
+
+            if(metal >= maxMetal)
+            {
+                perSecond = 0;
+                break;
+            }
+
+            perSecond = assignments.metal * miningMultiplier;
+
+            if(playerIsCurrentlyGathering && whatIsCurrentlyGathering === "metal")
+            {
+                perSecond += playerGatherAmountPerSecond;
+            }
+
+            let maxSwords = 0;
+            let swordCostPerSecond = 0;
+            // Need to check if player is creating swords and subtract that amount
+            // Need to take into consideration if military is less than swords because result would be < 0
+            if(assignments.military > 0 && swords <= assignments.military * 2)
+            {
+                // Creating new swords
+                maxSwords = assignments.military * 2;
+                if (swords < maxSwords)
+                {
+                    // sword making cost per second is amount of sword maker assignments * 100
+                    swordCostPerSecond = (assignments.swords * 100);
+                }
+            }
+
+            perSecond -= swordCostPerSecond;
+
+            break;
+
+        case "research":
+
+            if(playerIsCurrentlyGathering && whatIsCurrentlyGathering === "research")
+            {
+                perSecond += playerGatherAmountPerSecond * researchMultiplier;
+            }
+            else
+            {
+                perSecond = 0;
+            }
+
+            break;
+
+        default:
+            console.error("Invalid type for calculatePerSecond: " + type);
+    }
+    return perSecond;
+}
+
 function formatNumber(num)
 {
     if (num >= 1_000_000_000_000_000)
@@ -1152,10 +1273,13 @@ function updateDisplay()
     // Materials
     document.getElementById("food").textContent = formatNumber(food);
     document.getElementById("maxFood").textContent = formatNumber(maxFood);
+    document.getElementById("foodPerSecond").textContent = formatNumber(calculatePerSecond("food"));
     document.getElementById("wood").textContent = formatNumber(wood);
     document.getElementById("maxWood").textContent = formatNumber(maxWood);
+    document.getElementById("woodPerSecond").textContent = formatNumber(calculatePerSecond("wood"));
     document.getElementById("metal").textContent = formatNumber(metal);
     document.getElementById("maxMetal").textContent = formatNumber(maxMetal);
+    document.getElementById("metalPerSecond").textContent = formatNumber(calculatePerSecond("metal"));
     document.getElementById("swords").textContent = formatNumber(swords);
 
     // Materials Progress bars
@@ -1177,6 +1301,7 @@ function updateDisplay()
 
     // Research
     document.getElementById("researchPoints").textContent = formatNumber(research);
+    document.getElementById("researchPerSecond").textContent = formatNumber(calculatePerSecond("research"));  
     document.getElementById("booksAmount").textContent = formatNumber(buildings.book.amount); 
 
     if (farmingMultiplier >= 256)
@@ -1368,6 +1493,7 @@ function CheckBuildingAffordability()
         document.getElementById("researchTimberButton").disabled = false;
         document.getElementById("researchMiningButton").disabled = false;
         document.getElementById("researchResearchButton").disabled = false;
+        document.getElementById("researchGatheringButton").disabled = false;
     }
     else
     {
@@ -1375,6 +1501,7 @@ function CheckBuildingAffordability()
         document.getElementById("researchTimberButton").disabled = true;
         document.getElementById("researchMiningButton").disabled = true;
         document.getElementById("researchResearchButton").disabled = true;
+        document.getElementById("researchGatheringButton").disabled = true;
     }
 }
 
@@ -1621,4 +1748,4 @@ function tick()
     saveGame(true); // silently save the game
 }
 
-setInterval(tick, 1000);
+setInterval(tick, tickSpeed);
