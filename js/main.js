@@ -355,6 +355,7 @@ function buildBigHouse()
         buildings.bighouse.amount += 1;
 
         wood -= costWood;
+        food -= costFood;
         maxPopulation += building.effect.maxPopulationIncrease;
 
         buildings.bighouse.cost.wood = buildings.bighouse.cost.wood * 2;
