@@ -2,176 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Idle Game</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Idle game front page</title>
     <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
-    <h1>Idle Game</h1>
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="game.html">Game</a></li>
+            <li><a href="about.html">About</a></li>
+        </ul>
+    </nav>
 
-    <div class="header">
-        <a href="#" id="resetButton" onclick="resetGame()">Reset</a>
-        <a href="#" id="saveButton" onclick="saveGame()">Save</a>
-        <a href="#" id="loadButton" onclick="exportGame()">Export</a>
-        <a href="#" id="importButton" onclick="importGame()">Import</a>
-    </div>
-    <div class="exportArea" id="exportArea" style="display: none;">
-        <textarea id="exportTextArea" rows="2" cols="50" placeholder="Exported game data will appear here"></textarea>
-        <button class="button" id="copyButton" onclick="copyToClipboard()">Copy</button>
-    </div>
-
-    <div class="stats-container">
-        <div class="section" id="stats">
-            <h2>Resources</h2>
-
-            <!-- Resources container -->
-            <p>Population: <span id="population">2</span> / <span id="maxPopulation">5</span></p>
-
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <p style="margin: 0;">Food: <span id="food">50</span> / <span id="maxFood">100</span></p>
-                <div style="width: 100px; background: #444; border-radius: 5px; height: 10px;">
-                    <div id="foodProgress" style="width: 50%; height: 10px; background: #00b500; border-radius: 5px;"></div>
-                </div>
-                [ <span id="foodPerSecond">0</span> / sec ]
-            </div>
-
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <p style="margin: 0;">Wood: <span id="wood">0</span> / <span id="maxWood">100</span></p>
-                <div style="width: 100px; background: #444; border-radius: 5px; height: 10px;">
-                    <div id="woodProgress" style="width: 0%; height: 10px; background: #00b500; border-radius: 5px;"></div>
-                </div>
-                [ <span id="woodPerSecond">0</span> / sec ]
-            </div>
-            
-            <div id = "metalStats" style="display: none; align-items: center; gap: 10px;">
-                <p style="margin: 0;">Metal: <span id="metal">0</span> / <span id="maxMetal">0</span></p>
-                <div style="width: 100px; background: #444; border-radius: 5px; height: 10px;">
-                    <div id="metalProgress" style="width: 0%; height: 10px; background: #00b500; border-radius: 5px;"></div>
-                </div>
-                [ <span id="metalPerSecond">0</span> / sec ]
-            </div>
-            
-            <div id = "swordsStats" style="display: none; align-items: center; gap: 10px;">
-                <p style="margin: 0;">Swords: <span id="swords">0</span></p>
-            </div>
-            
-        </div>
-
-        <!-- Buildings container -->
-        <div class="section" id="buildingsinfo">
-            <h2>Buildings</h2>
-            <p>Farm: <span id="farm">0</span></p>
-            <p>Barn: <span id="barn">0</span></p>
-            <p>Hut: <span id="hut">0</span></p>
-            <p id="houseBuildings" style="display: none;">House: <span id="house">0</span></p>            
-            <p id="mineBuildings" style="display: none;">Mine: <span id="mine">0</span></p>
-            <p id="barracksBuildings" style="display: none;">Barracks: <span id="barracks">0</span></p>
-            <p id="bigHouseBuildings" style="display: none;">Big House: <span id="bigHouse">0</span></p>
-            <p id="biggerHouseBuildings" style="display: none;">Bigger House: <span id="biggerHouse">0</span></p>
-            <p id="biggestHouseBuildings" style="display: none;">Biggest House: <span id="biggestHouse">0</span></p>
-            <p id="libraryBuildings" style="display: none;">Library: <span id="library">0</span></p>
-        </div>
-    </div>
-
-    
-    <div style="display: flex; gap: 20px; align-items: flex-start;">
-
-        <!-- Player gathering container -->
-        <div class="section" id="gathering" style="flex: 1;" height="">
-            <h2>Gather Resources</h2>
-            <button class="button" id="buttonFood" onclick="playerStartGathering('food')">Gather Food</button>
-            <button class="button" id="buttonWood" onclick="playerStartGathering('wood')">Gather Wood</button>
-            <button class="button" id="buttonMetal" style="display: none;" onclick="playerStartGathering('metal')">Gather Metal</button>
-            <button class="button" id="buttonResearch" style="display: none;" onclick="playerStartGathering('research')">Research</button>
-        </div>
-        
-        <!-- Log container -->
-        <div class="section" id="gamelog" style="flex: 1;">
-            <div id="log" style="height: 100px; overflow-y: auto; background: #444; padding: 10px; border-radius: 5px;">
-            </div>
-        </div>
-    
+    <div class="section" id="homecontent">
+        <h3>Welcome to the Idle Game</h3>
+        <p>Click the button below to start playing:</p>
+        <button class="button" onclick="window.location.href='game.html'">Start Game</button>
     </div>
     
-    <div style="display: flex; gap: 20px; align-items: stretch;">
-        <!-- Buy buildings container -->
-        <div class="section" id="buildingsbuttons" style="flex: 1;">
-            <h2>Buy Buildings</h2>
-            <button class="button" id="farmButton" onclick="buildFarm()">Build Farm (50 Food)</button>
-            <button class="button" id="barnButton" onclick="buildBarn()" disabled="true">Build Barn (50 Wood)</button>
-            <button class="button" id="hutButton" onclick="buildHut()" disabled="true">Build Hut (10 Wood)</button>
-            <button class="button" id="houseButton" style="display: none;" onclick="buildHouse()">Build House (100 Wood)</button>
-            <button class="button" id="mineButton" style="display: none;" onclick="buildMine()">Build Mine (100 Food, 100 Wood)</button>
-            <button class="button" id="barracksButton" style="display: none;" onclick="buildBarracks()">Build Barracks (100 Food, 100 Wood, 100 Metal)</button>
-            <button class="button" id="bigHouseButton" style="display: none;" onclick="buildBigHouse()">Build Big House (1000 Food, 1000 Wood)</button>
-            <button class="button" id="biggerHouseButton" style="display: none;" onclick="buildBiggerHouse()">Build Bigger House (10000 Food, 10000 Wood, 5000 Metal)</button>
-            <button class="button" id="biggestHouseButton" style="display: none;" onclick="buildBiggestHouse()">Build Biggest House (100K Food, 100K Wood, 100K Metal)</button>
-            <button class="button" id="libraryButton" style="display: none;" onclick="buildLibrary()">Build Library (1.2K Food, 1.2K Wood, 1.2K Metal)</button>
-        </div>
-
-        <!-- Research / library container -->
-        <div class="section" id="researchbuttons" style="flex: 1; display: none;">
-            <h2>Library</h2>
-            Research: <span id="researchPoints">0</span> [ <span id="researchPerSecond">0</span> / sec ]
-            <p>Books: <span id="booksAmount">0</span></p>
-            <button class="button" id="buyBookButton" onclick="buildBook()" disabled="true">Write a book (200 Research)</button>
-            <h3>Read</h3>
-            <button class="button" id="researchFarmingButton" onclick="readBook('farming')" disabled="true">A book about farming</button>
-            <button class="button" id="researchTimberButton" onclick="readBook('timber')" disabled="true">A book about woodworking</button>
-            <button class="button" id="researchMiningButton" onclick="readBook('mining')" disabled="true">A book about mining</button>
-            <button class="button" id="researchResearchButton" onclick="readBook('research')" disabled="true">A book about writing a book</button>
-            <button class="button" id="researchGatheringButton" onclick="readBook('gathering')" disabled="true">A book about gathering</button>
-        </div>
-    </div>
-
-    <div class="assignments-battle-container" style="display: flex; gap: 20px;">
-
-        <!-- Assignments container -->
-        <div class="section" id="assignments">
-            <h2>Assign Population</h2>
-            <p>Available workers: <span id="availableWorkers">0</span></p>
-            <div>
-                <button class="button" id="button1" onclick="setAssignmentAmount(1)">1</button>       
-                <button class="button" id="button10" onclick="setAssignmentAmount(10)">10</button>
-                <button class="button" id="button100" onclick="setAssignmentAmount(100)">100</button>
-                <button class="button" id="button1000" onclick="setAssignmentAmount(1000)">1K</button>
-                <button class="button" id="buttonAll" onclick="setAssignmentAmount('all')">All</button>
-            </div>
-            <p>Farm Workers: <button class="button" onclick="changeAssignment('farm', -currentAssignmentAmount)">-</button> <span id="farmWorkers">0</span> <button class="button" onclick="changeAssignment('farm', currentAssignmentAmount)">+</button></p>
-            <p>Population Workers: <button class="button" onclick="changeAssignment('pop', -currentAssignmentAmount)">-</button> <span id="popWorkers">0</span> <button class="button" onclick="changeAssignment('pop', currentAssignmentAmount)">+</button></p>
-            <p>Timber Workers: <button class="button" onclick="changeAssignment('wood', -currentAssignmentAmount)">-</button> <span id="woodWorkers">0</span> <button class="button" onclick="changeAssignment('wood', currentAssignmentAmount)">+</button></p>
-            <p>Explorers: <button class="button" onclick="changeAssignment('explorers', -currentAssignmentAmount)">-</button> <span id="explorersWorkers">0</span> <button class="button" onclick="changeAssignment('explorers', currentAssignmentAmount)">+</button></p>
-            <p id="minersSection" style="display: none;">Miners: <button class="button" onclick="changeAssignment('metal', -currentAssignmentAmount)">-</button> <span id="metalWorkers">0</span> <button class="button" onclick="changeAssignment('metal', currentAssignmentAmount)">+</button></p>
-            <p id="militarySection" style="display: none;">Military: <button class="button" onclick="changeAssignment('military', -currentAssignmentAmount)">-</button> <span id="militaryWorkers">0</span> <button class="button" onclick="changeAssignment('military', currentAssignmentAmount)">+</button></p>
-            <p id="swordsSection" style="display: none;">Swords: <button class="button" onclick="changeAssignment('swords', -currentAssignmentAmount)">-</button> <span id="swordsWorkers">0</span> <button class="button" onclick="changeAssignment('swords', currentAssignmentAmount)">+</button></p>
-        </div>
-
-        <!-- Battle container -->
-        <div class="section" id="battle" style="display: none;">
-            <h2>Battle</h2>
-            <p id="militaryUnitCount">Military Units: <span id="units">0</span></p>
-            <p id="militaryStrengthCount">Total strength: <span id="militaryStrength">0</span></p>
-            <h2>Target</h2>
-            <p id="battleTarget">Target: <span id="targetName">Village A</span></p>
-            <p id="battleStrength">Strength: <span id="targetStrength">50</span></p>
-            <button class="button" id="battleButton" onclick="startBattle()" style="display: none;">Attack</button>
-            <h2>Combat</h2>
-            You vs Enemy:
-            <div style="width: 100px; background: #7e0000; border-radius: 5px; height: 10px;">
-                <div id="combatRatioBar" style="width: 0%; height: 10px; background: #00b500; border-radius: 5px;"></div>
-            </div>
-            <h3>Player</h3>
-            <p id="playerUnitsLeft">Units left: <span id="playerUnits">0</span></p>
-            <div style="width: 100px; background: #444; border-radius: 5px; height: 10px; display: inline-block;">
-                <div id="playerUnitsLeftBar" style="width: 100%; height: 10px; background: #00b500; border-radius: 5px;"></div>
-            </div>
-            <h3>Enemy</h3>
-            <p id="enemyUnitsLeft">Units left: <span id="enemyUnits">0</span></p>
-            <div style="width: 100px; background: #444; border-radius: 5px; height: 10px; display: inline-block;">
-                <div id="enemyUnitsLeftBar" style="width: 100%; height: 10px; background: #00b500; border-radius: 5px;"></div>
-            </div>
-        </div>
-    </div>
-
-    <script src="./js/main.js"></script>
 </body>
 </html>

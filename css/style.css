@@ -6,6 +6,21 @@ body
     padding: 20px;
 }
 
+
+#homecontent
+{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    text-align: center;
+    margin: 50px auto 0 auto;
+    width: 50%;
+}
+
+
+
 a
 {
     color: #444;
@@ -57,4 +72,38 @@ a
 {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+}
+
+nav
+{
+    background-color: #333;
+    padding: 1em 0;
+    position: fixed;
+    top: 0;
+    width: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    border-radius: 8px;
+}
+
+nav ul
+{
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+}
+
+nav ul li
+{
+    margin: 0 20px;
+}
+
+nav ul li a
+{
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
 }

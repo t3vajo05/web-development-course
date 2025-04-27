@@ -40,7 +40,7 @@ let battleTargetVillages = [
     { name: "Stormwatch Town", strength: 10000 },
     { name: "Shadowfen Town", strength: 20000 },
     { name: "Emberfall City", strength: 40000 },
-    { name: "Dawnspire City", strength: 10000 },
+    { name: "Dawnspire City", strength: 100000 },
     { name: "Nightshade City", strength: 500000 },
     { name: "King's Castle", strength: 1000000 }
 ];
