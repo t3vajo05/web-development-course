@@ -40,9 +40,9 @@ let battleTargetVillages = [
     { name: "Stormwatch Town", strength: 10000 },
     { name: "Shadowfen Town", strength: 20000 },
     { name: "Emberfall City", strength: 40000 },
-    { name: "Dawnspire City", strength: 100000 },
-    { name: "Nightshade City", strength: 500000 },
-    { name: "King's Castle", strength: 1000000 }
+    { name: "Dawnspire City", strength: 50000 },
+    { name: "Nightshade City", strength: 100000 },
+    { name: "King's Castle", strength: 250000 }
 ];
 
 let battleTarget = battleTargetVillages[0];
@@ -383,7 +383,7 @@ function buildBiggerHouse()
         metal -= costMetal;
         maxPopulation += building.effect.maxPopulationIncrease;
 
-        buildings.house.cost.wood = buildings.house.cost.wood * 2;
+        buildings.biggerhouse.cost.wood = buildings.biggerhouse.cost.wood * 2;
         buildings.biggerhouse.cost.food = buildings.biggerhouse.cost.food * 2;
         buildings.biggerhouse.cost.metal = buildings.biggerhouse.cost.metal * 2;
 
@@ -410,7 +410,7 @@ function buildBiggestHouse()
         metal -= costMetal;
         maxPopulation += building.effect.maxPopulationIncrease;
 
-        buildings.house.cost.wood = buildings.house.cost.wood * 2;
+        buildings.biggesthouse.cost.wood = buildings.biggesthouse.cost.wood * 2;
         buildings.biggesthouse.cost.food = buildings.biggesthouse.cost.food * 2;
         buildings.biggesthouse.cost.metal = buildings.biggesthouse.cost.metal * 2;
 
