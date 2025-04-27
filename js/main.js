@@ -763,59 +763,65 @@ function tickPlayerGather(type) // player gathers resouces
 
 function readBook(type)
 {
-    if (type === "farming" && buildings.book.amount > 0 && farmingMultiplier < 256)
+    if (type === "farming" && buildings.book.amount > 0 && farmingMultiplier < 16000)
     {
         farmingMultiplier *= 2;
         buildings.book.amount -= 1;
         addToLog("You are teaching your population about farming. Your farming multiplier is now " + farmingMultiplier);
-        if (farmingMultiplier >= 256)
+        if (farmingMultiplier >= 16000)
         {
             addToLog("Your population has mastered farming!");
             // hide the button
             document.getElementById("researchFarmingButton").style.display = "none";
         }
     }
-    else if(type === "timber" && buildings.book.amount > 0 && timberMultiplier < 256)
+    else if(type === "timber" && buildings.book.amount > 0 && timberMultiplier < 16000)
     {
         timberMultiplier *= 2;
         buildings.book.amount -= 1;
         addToLog("You are teaching your population about timber. Your timber multiplier is now " + timberMultiplier);
-        if (timberMultiplier >= 256)
+        if (timberMultiplier >= 16000)
         {
             addToLog("Your population has mastered timber!");
             // hide the button
             document.getElementById("researchTimberButton").style.display = "none";
         }
     }
-    else if(type === "mining" && buildings.book.amount > 0 && miningMultiplier < 256)
+    else if(type === "mining" && buildings.book.amount > 0 && miningMultiplier < 16000)
     {
         miningMultiplier *= 2;
         buildings.book.amount -= 1;
         addToLog("You are teaching your population about mining. Your mining multiplier is now " + miningMultiplier);
-        if (miningMultiplier >= 256)
+        if (miningMultiplier >= 16000)
         {
             addToLog("Your population has mastered mining!");
             // hide the button
             document.getElementById("researchMiningButton").style.display = "none";
         }
     }
-    else if(type === "research" && buildings.book.amount > 0 && researchMultiplier < 256)
+    else if(type === "research" && buildings.book.amount > 0 && researchMultiplier < 16000)
     {
         researchMultiplier *= 2;
         buildings.book.amount -= 1;
         addToLog("You are teaching your population about research. Your research multiplier is now " + researchMultiplier);
-        if (researchMultiplier >= 256)
+        if (researchMultiplier >= 16000)
         {
             addToLog("You have mastered research!");
             // hide the button
             document.getElementById("researchResearchButton").style.display = "none";
         }
     }
-    else if(type === "gathering" && buildings.book.amount > 0)
+    else if(type === "gathering" && buildings.book.amount > 0 && playerGatherAmount < 256000)
     {
         playerGatherAmount *= 2;
         buildings.book.amount -= 1;
         addToLog("You are learning about gathering. Your gathering amount is now " + playerGatherAmount);
+        if (playerGatherAmount >= 256000)
+        {
+            addToLog("You have mastered gathering!");
+            // hide the button
+            document.getElementById("researchGatheringButton").style.display = "none";
+        }
     }
     updateDisplay();
 }
@@ -1304,21 +1310,25 @@ function updateDisplay()
     document.getElementById("researchPerSecond").textContent = formatNumber(formatNumber(calculatePerSecond("research")));  
     document.getElementById("booksAmount").textContent = formatNumber(buildings.book.amount); 
 
-    if (farmingMultiplier >= 256)
+    if (farmingMultiplier >= 16000)
     {
         document.getElementById("researchFarmingButton").style.display = "none";
     }
-    if (timberMultiplier >= 256)
+    if (timberMultiplier >= 16000)
     {
         document.getElementById("researchTimberButton").style.display = "none";
     }
-    if (miningMultiplier >= 256)
+    if (miningMultiplier >= 16000)
     {
         document.getElementById("researchMiningButton").style.display = "none";
     }
-    if (researchMultiplier >= 256)
+    if (researchMultiplier >= 16000)
     {
         document.getElementById("researchResearchButton").style.display = "none";
+    }
+    if (playerGatherAmount >= 256000)
+    {
+        document.getElementById("researchGatheringButton").style.display = "none";
     }
 
     // Population
