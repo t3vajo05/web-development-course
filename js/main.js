@@ -1273,13 +1273,13 @@ function updateDisplay()
     // Materials
     document.getElementById("food").textContent = formatNumber(food);
     document.getElementById("maxFood").textContent = formatNumber(maxFood);
-    document.getElementById("foodPerSecond").textContent = formatNumber(calculatePerSecond("food"));
+    document.getElementById("foodPerSecond").textContent = formatNumber(formatNumber(calculatePerSecond("food")));
     document.getElementById("wood").textContent = formatNumber(wood);
     document.getElementById("maxWood").textContent = formatNumber(maxWood);
-    document.getElementById("woodPerSecond").textContent = formatNumber(calculatePerSecond("wood"));
+    document.getElementById("woodPerSecond").textContent = formatNumber(formatNumber(calculatePerSecond("wood")));
     document.getElementById("metal").textContent = formatNumber(metal);
     document.getElementById("maxMetal").textContent = formatNumber(maxMetal);
-    document.getElementById("metalPerSecond").textContent = formatNumber(calculatePerSecond("metal"));
+    document.getElementById("metalPerSecond").textContent = formatNumber(formatNumber(calculatePerSecond("metal")));
     document.getElementById("swords").textContent = formatNumber(swords);
 
     // Materials Progress bars
@@ -1301,7 +1301,7 @@ function updateDisplay()
 
     // Research
     document.getElementById("researchPoints").textContent = formatNumber(research);
-    document.getElementById("researchPerSecond").textContent = formatNumber(calculatePerSecond("research"));  
+    document.getElementById("researchPerSecond").textContent = formatNumber(formatNumber(calculatePerSecond("research")));  
     document.getElementById("booksAmount").textContent = formatNumber(buildings.book.amount); 
 
     if (farmingMultiplier >= 256)
