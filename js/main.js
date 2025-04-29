@@ -800,12 +800,12 @@ function readBook(type)
             document.getElementById("researchMiningButton").style.display = "none";
         }
     }
-    else if(type === "research" && buildings.book.amount > 0 && researchMultiplier < 16000)
+    else if(type === "research" && buildings.book.amount > 0 && researchMultiplier < 512000)
     {
         researchMultiplier *= 2;
         buildings.book.amount -= 1;
         addToLog("You are teaching your population about research. Your research multiplier is now " + researchMultiplier);
-        if (researchMultiplier >= 16000)
+        if (researchMultiplier >= 512000)
         {
             addToLog("You have mastered research!");
             // hide the button
@@ -1330,7 +1330,7 @@ function updateDisplay()
     {
         document.getElementById("researchMiningButton").style.display = "none";
     }
-    if (researchMultiplier >= 16000)
+    if (researchMultiplier >= 512000)
     {
         document.getElementById("researchResearchButton").style.display = "none";
     }
