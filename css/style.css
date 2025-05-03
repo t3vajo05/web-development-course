@@ -89,6 +89,10 @@ a
     margin: 5px 0;
 }
 
+.resource-row-hidden {
+    display: none;
+}
+
 .resource-label {
     margin: 0;
 }
@@ -105,12 +109,6 @@ a
     height: 10px;
     background: #00b500;
     border-radius: 5px;
-}
-
-.stats-container
-{
-    display: flex;
-    gap: 20px;
 }
 
 .section
