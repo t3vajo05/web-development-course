@@ -2,6 +2,8 @@
 
 Welcome to **Idle Game**, a resource management and strategy game where you build your village, gather resources, and create a military to conquer the kingdom.
 
+Inspired by games such as [Trimps](https://trimps.github.io/) and [Dwarf Fortress](https://www.bay12games.com/dwarves/).
+
 ## Table of Contents
 - [About the Game](#about-the-game)
 - [Features](#features)
