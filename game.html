@@ -17,13 +17,13 @@
     </nav>
 
     <div class="header">
-        <a href="#" id="resetButton" onclick="resetGame()">Reset</a>
-        <a href="#" id="saveButton" onclick="saveGame()">Save</a>
-        <a href="#" id="loadButton" onclick="exportGame()">Export</a>
-        <a href="#" id="importButton" onclick="importGame()">Import</a>
+        <a href="#" id="resetButton" class="header-link" onclick="resetGame()">Reset</a>
+        <a href="#" id="saveButton" class="header-link" onclick="saveGame()">Save</a>
+        <a href="#" id="loadButton" class="header-link" onclick="exportGame()">Export</a>
+        <a href="#" id="importButton" class="header-link" onclick="importGame()">Import</a>
     </div>
-    <div class="exportArea" id="exportArea" style="display: none;">
-        <textarea id="exportTextArea" rows="2" cols="50" placeholder="Exported game data will appear here"></textarea>
+    <div class="export-area" id="exportArea">
+        <textarea id="exportTextArea" class="export-textarea" rows="2" cols="50" placeholder="Exported game data will appear here"></textarea>
         <button class="button" id="copyButton" onclick="copyToClipboard()">Copy</button>
     </div>
 
@@ -31,60 +31,57 @@
         <div class="section" id="stats">
             <h2>Resources</h2>
 
-            <!-- Resources container -->
             <p>Population: <span id="population">2</span> / <span id="maxPopulation">5</span></p>
 
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <p style="margin: 0;">Food: <span id="food">50</span> / <span id="maxFood">100</span></p>
-                <div style="width: 100px; background: #444; border-radius: 5px; height: 10px;">
-                    <div id="foodProgress" style="width: 50%; height: 10px; background: #00b500; border-radius: 5px;"></div>
+            <div class="resource-row">
+                <p class="resource-label">Food: <span id="food">50</span> / <span id="maxFood">100</span></p>
+                <div class="progress-bar">
+                    <div id="foodProgress" class="progress-bar-fill" style="width: 50%;"></div>
                 </div>
                 [ <span id="foodPerSecond">0</span> / sec ]
             </div>
 
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <p style="margin: 0;">Wood: <span id="wood">0</span> / <span id="maxWood">100</span></p>
-                <div style="width: 100px; background: #444; border-radius: 5px; height: 10px;">
-                    <div id="woodProgress" style="width: 0%; height: 10px; background: #00b500; border-radius: 5px;"></div>
+            <div class="resource-row">
+                <p class="resource-label">Wood: <span id="wood">0</span> / <span id="maxWood">100</span></p>
+                <div class="progress-bar">
+                    <div id="woodProgress" class="progress-bar-fill" style="width: 0%;"></div>
                 </div>
                 [ <span id="woodPerSecond">0</span> / sec ]
             </div>
-            
-            <div id = "metalStats" style="display: none; align-items: center; gap: 10px;">
-                <p style="margin: 0;">Metal: <span id="metal">0</span> / <span id="maxMetal">0</span></p>
-                <div style="width: 100px; background: #444; border-radius: 5px; height: 10px;">
-                    <div id="metalProgress" style="width: 0%; height: 10px; background: #00b500; border-radius: 5px;"></div>
+
+            <div id="metalStats" class="resource-row hidden">
+                <p class="resource-label">Metal: <span id="metal">0</span> / <span id="maxMetal">0</span></p>
+                <div class="progress-bar">
+                    <div id="metalProgress" class="progress-bar-fill" style="width: 0%;"></div>
                 </div>
                 [ <span id="metalPerSecond">0</span> / sec ]
             </div>
-            
-            <div id = "swordsStats" style="display: none; align-items: center; gap: 10px;">
-                <p style="margin: 0;">Swords: <span id="swords">0</span></p>
+
+            <div id="swordsStats" class="resource-row hidden">
+                <p class="resource-label">Swords: <span id="swords">0</span></p>
             </div>
-            
         </div>
 
-        <!-- Buildings container -->
         <div class="section" id="buildingsinfo">
             <h2>Buildings</h2>
             <p>Farm: <span id="farm">0</span></p>
             <p>Barn: <span id="barn">0</span></p>
             <p>Hut: <span id="hut">0</span></p>
-            <p id="houseBuildings" style="display: none;">House: <span id="house">0</span></p>            
-            <p id="mineBuildings" style="display: none;">Mine: <span id="mine">0</span></p>
-            <p id="barracksBuildings" style="display: none;">Barracks: <span id="barracks">0</span></p>
-            <p id="bigHouseBuildings" style="display: none;">Big House: <span id="bigHouse">0</span></p>
-            <p id="biggerHouseBuildings" style="display: none;">Bigger House: <span id="biggerHouse">0</span></p>
-            <p id="biggestHouseBuildings" style="display: none;">Biggest House: <span id="biggestHouse">0</span></p>
-            <p id="libraryBuildings" style="display: none;">Library: <span id="library">0</span></p>
+            <p id="houseBuildings" class="hidden">House: <span id="house">0</span></p>
+            <p id="mineBuildings" class="hidden">Mine: <span id="mine">0</span></p>
+            <p id="barracksBuildings" class="hidden">Barracks: <span id="barracks">0</span></p>
+            <p id="bigHouseBuildings" class="hidden">Big House: <span id="bigHouse">0</span></p>
+            <p id="biggerHouseBuildings" class="hidden">Bigger House: <span id="biggerHouse">0</span></p>
+            <p id="biggestHouseBuildings" class="hidden">Biggest House: <span id="biggestHouse">0</span></p>
+            <p id="libraryBuildings" class="hidden">Library: <span id="library">0</span></p>
         </div>
     </div>
 
     
-    <div style="display: flex; gap: 20px; align-items: flex-start;">
+    <div class="resource-log-container" style="display: flex; gap: 20px; align-items: flex-start;">
 
         <!-- Player gathering container -->
-        <div class="section" id="gathering" style="flex: 1;" height="">
+        <div class="section" id="gathering" style="flex: 1;" height="" width="100%">
             <h2>Gather Resources</h2>
             <button class="button" id="buttonFood" onclick="playerStartGathering('food')">Gather Food</button>
             <button class="button" id="buttonWood" onclick="playerStartGathering('wood')">Gather Wood</button>
