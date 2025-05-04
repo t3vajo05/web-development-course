@@ -37,11 +37,13 @@ The game is designed to be played casually, with progress happening over time as
 2. **Gather Resources**:
    - Assign workers to gather food, wood, and other resources.
    - Use the "Gather Resources" buttons to manually gather resources and help your villagers.
-3. **Build Your Village**:
+3. **Feed Your Village**:
+   - Your population needs food! Don't let your food run out or your population will start starving!
+4. **Build Your Village**:
    - Build farms, barns, and houses to increase your resource capacity and population.
-4. **Train Your Military**:
+5. **Train Your Military**:
    - Assign workers to military tasks and craft swords to prepare for battles.
-5. **Conquer Villages**:
+6. **Conquer Villages**:
    - Attack nearby villages and towns to expand your influence and weaken the kingdom.
 
 ---
